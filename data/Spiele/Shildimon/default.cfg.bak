@@ -1,0 +1,25 @@
+[joram]
+name = joram
+type = player@objecttypes
+inherit = player@objecttemplates
+landschaft = Eigenschaften@enginetest2
+viewdistance = 10
+viewdirection = 0
+position = 0.0,0.0,0.0
+velocity = 0.0,0.0,0.0
+movetype = grid
+max-speed = 2
+eventmap = adventure_eventmap@objecttemplates
+image = \turtle.png
+control = keyboard+mouse
+events = erinnerung
+
+[TYPES]
+player = joram
+
+[UPDATE]
+force-loading = joram
+
+[ABODE INDEX]
+enginetest2 = joram
+

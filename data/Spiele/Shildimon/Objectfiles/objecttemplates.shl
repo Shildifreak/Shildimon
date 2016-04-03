@@ -1,0 +1,56 @@
+[player]
+inventory = blah
+left_hand = blub
+right_hand = blub
+loopaction = update_movement:[]
+
+[adventure_eventmap]
+type = eventmap
+move = set_movement:[]
+dialog = handle_dialogevent:[]
+click = handle_clickevent:[]
+unclick = handle_unclickevent:[]
+movebymouse = varset:[envvar:[object],movebymouse,1]
+unmovebymouse = varset:[envvar:[object],movebymouse,0]
+
+input = text:["test input"]
+action = text:["test action"]
+back = text:["test back"]
+zoomin = text:["test zoom"]
+zoomout = text["test zoom"]
+
+[inventory_eventmap]
+type = eventmap
+move = move_mouse:[]
+dialog = handle_dialogevent:[]
+input = none
+action = none
+zoom = none
+
+[adventure_keymap]
+elements = move,dialog,click,unclick,movebymouse,unmovebymouse,input,action,back,zoom
+
+[inventory_keymap]
+
+[landscape]
+centerpos = tmpoffsetfunc:[var:[envvar:[object],position]]
+
+[crafting]
+item1,item2(ordered-by-alphabet) = action wie zB Ersetzen der Ausgangsitems durch ein neues Item
+Brett,Nagel = Brett_mit_Nagel
+Brett,Brett,#verharzter_Ast = Langes_Brett
+Langer_Stock,Leine = Stock_mit_Leine
+Oellampe,#Flasche_Oel = gefuellte_Oellampe
+Kurzer_Stock,Spaltklinge = Beil
+Schwertgriff,Schwertklinge = Schwert
+Langer_Stock,Spaltklinge = Axt
+#Schale,Uraninit,#Tiegelzange,Salzsaeure,#Flasche,#Geigerzaehler = Polonium
+Langer_Stock,Leine,Magnet = Magnetangel
+Stock_mit_Leine,Magnet = Magnetangel
+Langer_Stock,Beere = Langer_Stock_mit_Beere
+Seil = Lasso
+gefuellte_Oellampe,#Kerze = brennende_Oellampe
+Ball_mit_Loch,Kaugummi = Ball_mit_Kaugummi
+
+[decrafting]
+Magnetangel = Stock_mit_Leine,Magnet

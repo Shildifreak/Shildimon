@@ -1,0 +1,10 @@
+0     = test
+1     = töööst!!!
+music = bgmusic.mp3
+name  = Landschaftsname
+size  = [1, 1]
+
+[[0,0]]
+  action     = 23
+  background = boden.png
+  file       = gras.png

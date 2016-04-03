@@ -1,0 +1,10 @@
+python module consoleIO
+Copyright (c) 2015 Joram Brenz
+
+This package contains
+    the colorama module by Jonathan Hartley (see ./colorama/LICENSE.txt)
+    and my own getchar module.
+
+Furthermore this folder may include
+    the colorama module demos (examples are always helpful)
+    and a readchar module where I took some inspiration.

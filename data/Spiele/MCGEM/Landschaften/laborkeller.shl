@@ -1,0 +1,142 @@
+[Eigenschaften]
+size = (5,5)
+name = laborkeller
+music = forest3.ogg
+initaction=wenn(var(labor.donovan)=None,,loch.shape(wandloch.png))
+
+[0,0]
+action=wenn(var(geigerz)=None,text(Da liegt ein Geigerzähler in der Kiste.),text(Eine leere Kiste. Da war mal der Geigerzähler drin. Man könnte ihn auch wieder hinein legen, aber wieso sollte man das?))
+background=kistebesenoben.png
+file=kistebesenoben.png
+hand=wenn(var(geigerz)=None,getitem(Geigerzaehler,(varset(geigerz=weg),text(Du hast den Geigerzähler erhalten.))),)
+Geigerzaehler=(removeitem(Geigerzaehler),varset(geigerz=None),text(Du hast den Geigerzähler zurückgelegt.))
+
+[0,1]
+action=.
+background=kisteuntenlabor.png
+file=kisteuntenlabor.png
+
+[0,2]
+action=x
+background=schreibtischoben.png
+file=schreibtischoben.png
+
+[0,3]
+action=x
+background=schreibtischmitte.png
+file=schreibtischmitte.png
+
+[0,4]
+action=(image(Buch.png),varset(buchgelesen=True),text(Jetzt weiß ich die Geheimzahl.))
+background=schreibtischuntenbuch.png
+file=schreibtischuntenbuch.png
+
+[1,0]
+action=x
+background=steinwand.png
+file=steinwand.png
+
+[1,1]
+action=.
+background=kellerwandboden.png
+file=kellerwandboden.png
+
+[1,2]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[1,3]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[1,4]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[2,0]
+action=wenn(var(labor.donovan)=None,x,open(tunnel,-2,1))
+background=steinwand.png
+file=steinwand.png
+
+[2,1]
+action=.
+background=kellerwandboden.png
+file=kellerwandboden.png
+
+[2,2]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[2,3]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[2,4]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[3,0]
+action=x
+background=steinwand.png
+file=steinwand.png
+
+[3,1]
+action=.
+background=kellerwandboden.png
+file=kellerwandboden.png
+
+[3,2]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[3,3]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[3,4]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[4,0]
+action=x
+background=steinwand.png
+file=steinwand.png
+
+[4,1]
+action=wenn(var(richtung)="links",(open(labor,-4,-3),rechts,rechts),)
+background=treppekeller.png
+file=treppekeller.png
+
+[4,2]
+action=wenn(var(tresoroffen)=None,text(Da braucht man eine vierstellige Geheimzahl.),(text("Jetzt, wo ich die Geheimzahl eingegeben habe geht der Tresor ganz einfach auf."),wenn(var(uraninit)=None,(getitem(Uraninit,(varset(uraninit=weg),text("Du hast Uraninit erhalten. Das ist der wichtigste Bestandteil des Experimentes, denn aus diesem Material, welches man auch Pechblende nennt soll das radioaktive Element isoliert werden.")),text(Du hast keine Hand frei.))),text("Da ist nichts mehr, außer viel Platz für wertvolle oder gefährliche Stoffe."),)))
+background=safe.png
+file=safe.png
+Uraninit=(removeitem(Uraninit),varset(uraninit=None),text(Du hast das Uraninit zurück in den Tresor gelegt.))
+inputaction=wenn(INPUT=1898,wenn(var(tresoroffen)=None,(varset(tresoroffen=true),text("Jetzt geht der Tresor aufzumachen."))),text("Das war wohl nicht die richtige Zahl."))
+
+[4,3]
+action=.
+background=bodenlabor.png
+file=bodenlabor.png
+
+[4,4]
+action=text("Da ist ein tiefes Loch im Boden. Es ist so dunkel, dass man nicht bis zum Boden sehen kann. Ob da unten wohl etwas ist?")
+background=loch.png
+file=loch.png
+Magnetangel=wenn(var(schale)=None,getitem(Schale,(varset(schale=weg),text(Du hast eine Metallschale erhalten.)),text("Da hängt irgendwas dran, aber du brauchst eine freie Hand um es zu nehmen.")),)
+Schale=(removeitem(Schale),varset(schale=None),text(Du hast die Schale zurück in das Loch geworfen.))
+
+[objekt loch]
+action=None
+position=(2,0)
+bild=transparent.png
+loopfunction=None

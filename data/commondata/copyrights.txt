@@ -1,0 +1,29 @@
+[images from MeisterL]
+copyright owner = MeisterL
+license = GPLv3
+
+[images from Entenfan]
+copyright owner = Entenfan
+license = GPLv3
+
+[everything else]
+copyright owner = Joram Brenz
+license = GPLv3
+
+[gras and bramble]
+original image = drawer from SuperTux
+edited by = Joram Brenz
+
+[Walrossbild.png]
+original image = Heringway
+edited by = Joram Brenz
+
+[lizard.mod]
+The music was written by THE LIZARD KING
+E-mail: gustaf.grefberg@pp.itv.se
+Homepage: http://www.itv.se/~a1055/frames.html
+Files: lizard.mod
+License: free to use, modify and redistribute
+
+[cave.mod, forest3.ogg, forestmap.ogg, fortress2.mod, Mortimers_chipdisko.mod, whisphunt.ogg]
+taken from SuperTux 1 and 0.3.3

@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="Zeichnung.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3981">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3983" />
+      <stop
+         id="stop3989"
+         offset="0.36000001"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0.5;"
+         offset="0.72211725"
+         id="stop3991" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3985" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3965">
+      <stop
+         style="stop-color:#00ffff;stop-opacity:1;"
+         offset="0"
+         id="stop3967" />
+      <stop
+         style="stop-color:#00ffff;stop-opacity:0;"
+         offset="1"
+         id="stop3969" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3957">
+      <stop
+         style="stop-color:#00ffff;stop-opacity:1;"
+         offset="0"
+         id="stop3959" />
+      <stop
+         style="stop-color:#00ffff;stop-opacity:0;"
+         offset="1"
+         id="stop3961" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3949">
+      <stop
+         style="stop-color:#00ffff;stop-opacity:1;"
+         offset="0"
+         id="stop3951" />
+      <stop
+         style="stop-color:#00ffff;stop-opacity:0;"
+         offset="1"
+         id="stop3953" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3941">
+      <stop
+         style="stop-color:#00ffff;stop-opacity:1;"
+         offset="0"
+         id="stop3943" />
+      <stop
+         style="stop-color:#00ffff;stop-opacity:0;"
+         offset="1"
+         id="stop3945" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3931">
+      <stop
+         style="stop-color:#d00b0b;stop-opacity:1;"
+         offset="0"
+         id="stop3933" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0;"
+         offset="1"
+         id="stop3935" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3923">
+      <stop
+         style="stop-color:#b10000;stop-opacity:1;"
+         offset="0"
+         id="stop3925" />
+      <stop
+         style="stop-color:#b10000;stop-opacity:0;"
+         offset="1"
+         id="stop3927" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3905">
+      <stop
+         style="stop-color:#8f0000;stop-opacity:1;"
+         offset="0"
+         id="stop3907" />
+      <stop
+         id="stop3913"
+         offset="0.5"
+         style="stop-color:#b10000;stop-opacity:0.05098039;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3909" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3883">
+      <stop
+         style="stop-color:#a00000;stop-opacity:1;"
+         offset="0"
+         id="stop3885" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3887" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3867">
+      <stop
+         style="stop-color:#b10000;stop-opacity:1;"
+         offset="0"
+         id="stop3869" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0;"
+         offset="1"
+         id="stop3871" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3859">
+      <stop
+         style="stop-color:#b10000;stop-opacity:0.56862748;"
+         offset="0"
+         id="stop3861" />
+      <stop
+         id="stop3891"
+         offset="0.5"
+         style="stop-color:#b10000;stop-opacity:0.15294118;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3863" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="269.23813 : 503.25696 : 1"
+       inkscape:vp_y="0 : 3632.8294 : 0"
+       inkscape:vp_z="3946.7548 : 503.25696 : 1"
+       inkscape:persp3d-origin="2107.9964 : -133.91844 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective2840"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="295.42825 : 505.48884 : 1"
+       inkscape:vp_y="5809.2675 : 0 : 0"
+       inkscape:vp_z="295.42825 : -1320.1179 : 1"
+       inkscape:persp3d-origin="-723.48074 : -407.31446 : 1"
+       id="perspective10-2" />
+    <inkscape:perspective
+       id="perspective2925"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="301.12252 : 484.8274 : 1"
+       inkscape:vp_y="5809.2675 : 0 : 0"
+       inkscape:vp_z="655.31844 : -1317.1662 : 1"
+       inkscape:persp3d-origin="-363.59061 : -404.3628 : 1"
+       id="perspective10-2-3" />
+    <inkscape:perspective
+       id="perspective3052"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3859"
+       id="linearGradient3865"
+       x1="311.85751"
+       y1="411.66061"
+       x2="311.85751"
+       y2="541.17126"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3867"
+       id="linearGradient3876"
+       gradientUnits="userSpaceOnUse"
+       x1="39.273636"
+       y1="672.39642"
+       x2="117.9541"
+       y2="571.01239" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3883"
+       id="linearGradient3889"
+       x1="119.36791"
+       y1="728.90015"
+       x2="190.58038"
+       y2="571.01239"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3905"
+       id="linearGradient3911"
+       x1="307.63147"
+       y1="676.52094"
+       x2="307.63147"
+       y2="570.26221"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3923"
+       id="linearGradient3929"
+       x1="572.54297"
+       y1="676.23615"
+       x2="504.85928"
+       y2="571.47852"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3931"
+       id="linearGradient3937"
+       x1="498.24976"
+       y1="739.83722"
+       x2="413.11734"
+       y2="724.54742"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3941"
+       id="linearGradient3947"
+       x1="-5.5473595"
+       y1="377.43183"
+       x2="633.19531"
+       y2="377.43183"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3949"
+       id="linearGradient3955"
+       x1="-28.162281"
+       y1="700.64827"
+       x2="241.84921"
+       y2="700.64825"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3957"
+       id="linearGradient3963"
+       x1="238.92169"
+       y1="705.5986"
+       x2="376.34122"
+       y2="705.5986"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3965"
+       id="linearGradient3971"
+       x1="642.8291"
+       y1="708.03668"
+       x2="491.61993"
+       y2="708.03668"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3981"
+       id="radialGradient3987"
+       cx="339.56549"
+       cy="379.23608"
+       fx="339.56549"
+       fy="379.23608"
+       r="312.26129"
+       gradientTransform="matrix(-0.86136408,5.1527864e-8,-6.1389491e-8,-1.1873339,601.19008,829.51592)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35934694"
+     inkscape:cx="270.89954"
+     inkscape:cy="489.87139"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="772"
+     inkscape:window-height="489"
+     inkscape:window-x="-2"
+     inkscape:window-y="-19"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3656"
+       width="951.7265"
+       height="648.39844"
+       x="-175.31804"
+       y="236.99417"
+       inkscape:export-filename="/home/joram/Desktop/MCGEM/data/other/Startbild.png"
+       inkscape:export-xdpi="75.647926"
+       inkscape:export-ydpi="75.647926" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.09999989999999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect2816"
+       width="800"
+       height="480"
+       x="-97.14286"
+       y="298.07648"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png" />
+    <path
+       id="path3000"
+       style="fill:url(#linearGradient3929);fill-opacity:1;fill-rule:evenodd;stroke:none"
+       d="m 380.75904,571.47851 261.06312,104.75761 -149.70222,0 -124.22353,-104.75761 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path3014"
+       style="fill:url(#linearGradient3911);fill-opacity:1;fill-rule:evenodd;stroke:none"
+       d="m 309.935,570.26218 65.90622,106.25878 -136.41953,0 45.9028,-106.25878 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path3024"
+       style="fill:url(#linearGradient3889);fill-opacity:1;fill-rule:evenodd;stroke:none"
+       d="M 261.57049,571.01239 119.36791,672.3964 125.21942,728.90013 261.79286,582.84411 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path3028"
+       style="fill:url(#linearGradient3876);fill-opacity:1;fill-rule:evenodd;stroke:none"
+       d="m 261.57049,571.01239 -142.20258,101.38401 -145.030191,0 259.342351,-101.38401 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path3026"
+       style="fill:#be0000;fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient3955);stroke-opacity:1;stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 119.36791,672.3964 -145.030191,0 10.671718,56.50373 140.209983,0 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path3012"
+       style="fill:#be0000;fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient3963);stroke-opacity:1"
+       d="m 375.84122,676.52096 -136.41953,0 1.92049,58.15529 131.74164,0 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path2996"
+       style="fill:url(#linearGradient3937);fill-opacity:1;fill-rule:evenodd;stroke:none"
+       d="m 367.89641,571.47851 124.22353,104.75761 6.12983,63.60111 -129.3928,-162.34963 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path2998"
+       style="fill:#be0000;fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient3971);stroke-opacity:1"
+       d="m 641.82216,676.23612 -149.70222,0 6.12983,63.60111 144.07932,0 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       id="path3014-0"
+       style="fill:url(#linearGradient3865);fill-opacity:1.0;fill-rule:evenodd;stroke:none"
+       d="m 322.18496,541.17127 306.54389,-129.51066 -633.7426674,0 287.9960174,129.40153 39.20276,0.10913 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       id="path3012-7"
+       style="fill:#be0000;fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient3947);stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 630.69531,411.66061 -633.7426695,0 8.9217172,-68.45757 612.0113323,0 z"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:66.27223205999999323px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:url(#radialGradient3987);fill-opacity:1;stroke:none;font-family:Almendra SC;-inkscape-font-specification:Almendra SC Bold"
+       x="17.589417"
+       y="394.67752"
+       id="text3973"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3975"
+         x="17.589417"
+         y="394.67752"
+         style="fill:url(#radialGradient3987);fill-opacity:1">~~Quest Of Curie~~~~~</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:54.11035156px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Almendra SC;-inkscape-font-specification:Almendra SC"
+       x="-13.946968"
+       y="716.22235"
+       id="text3993"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3995"
+         x="-13.946968"
+         y="716.22235">Start</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:61.64635468px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Almendra SC;-inkscape-font-specification:Almendra SC"
+       x="516.81372"
+       y="727.54309"
+       id="text3997"
+       inkscape:export-filename="/home/joram/py4kids/Spiele/MCGEM_heringversion/data/other/text4001.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3999"
+         x="516.81372"
+         y="727.54309">End</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:49.62572861px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Almendra SC;-inkscape-font-specification:Almendra SC"
+       x="258.02615"
+       y="724.88953"
+       id="text4001"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4003"
+         x="258.02615"
+         y="724.88953">Help</tspan></text>
+  </g>
+</svg>

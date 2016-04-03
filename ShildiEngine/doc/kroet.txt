@@ -1,0 +1,82 @@
+Verzweigung
+    {if bool; ausdruck_wahr; ausdruck_falsch}
+    -> Rückgabewert von ausgeführtem ausdruck
+Mehrfachverzweigung
+    {case index; ausdruck_1; ausdruck_2; ...; ausdruck_n; ausdruck_sonst}
+    -> Rückgabewert von ausgeführtem ausdruck
+
+Kopfabweisende Schleife
+    {while bedingung; ausdruck}
+    -> [Rückgabewerte von anweisung]
+Fußabweisende Schleife
+    {until bedingung; ausdruck}
+    -> [Rückgabewerte von anweisung]
+
+"Zählschleife"
+    {for varname in Menge; anweisung} -> [Rückgabewerte von anweisung]
+
+keine Ahnung was das werden soll, momentan noch ungültig
+    {ausdruck_1; ...; ausdruck_n} (?)
+
+:=  Zuweisung (mit Liste für Attribute, Einzelwert für tmpvar)
++=  Erhöhen um
+-=  Veringern um
+*=  Verfielfachen um
+/=  Teilen durch
+%=  wie auch immer man das dann nennt, s.o mit modulo
+**= -""-
+
+<<  deutlich kleiner (?)
+<   kleiner
+<=  kleiner gleich (?)
+==  gleich
+>=  größer gleich
+>   größer
+>>  deutlich größer
+
+!=  ungleich
+<>  nochmal ungleich
+
+-   minus
++   plus
+*   multiplizieren
+/   dividieren
+%   ganzzahliger Rest bei Teilung durch
+**  potenzieren
+
+<-  von rechts in Liste
+->  von links in Liste
+><  Listen verbinden
+
+!   String intepretieren mit Parametern
+:   Funktion aufrufen mit Parametern
+.   linkes und rechtes Argument zu liste zusammenfassen (wenn argumente listen, diese auflösen)
+#   Variable lesen (mit Liste für Attribute, Einzelwert für tmpvar)
+
+Was mach' ich hiermit?
+mul:[2,3]
+"#1*#2"![2,3]
+#objekt.varname![2.3]
+
+BEISPIELE
+test1
+test2(bla,bli,blub)
+var(envvar(\object),\position)
+mul(3,2,mul(4,5))
+mul(2,3)=mul(3,2)
+
+42
+mul(2,3)
+2*(1+4)
+mul(2,3)=mul(4,5)
+mul(2,3)=mul("böse:), ",2 and 3)
+0{1;until{1};3;0}
+mul:[2,3]/6
+3*(a+b)
+3 random:["*","+"] 4+2
+[a,c]:=a.b:[a.c,3]
+[a,c]:=#[a,b]:[a.c,3]
+{if a;b;c+1;d}
+{until a;b}
+    
+#M# Negative Zahlen akzeptieren! Aber wie?

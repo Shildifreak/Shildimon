@@ -1,0 +1,201 @@
+Anleitung für die Befehle von Shildimon
+
+Befehle:
+ (Diese Befehle beschreiben was passiert, wenn der Spieler das Feld betreten will,
+  auf welchem selbige eingetragen sind)
+
+  x
+-> dieses Feld ist gesperrt
+       (Knallgeräusch + Spieler läuft nicht)
+
+  .
+-> dieses Feld ist begehbar
+   (Spieler geht ein Feld in Blickrichtung)
+
+  xtbrl
+-> teilweise geperrtes Feld
+   (t -> von oben nicht betretbar, b -> von unten nicht betretbar,
+    l -> von links nicht betretbar, r -> von rechts nicht betretbar;
+    es müssen nicht alle dieser Buchstaben hinter dem x stehen: zB. xtb)
+
+  (befehl,befehl,...)
+-> führt mehrere Befehle der Reihe nach durch
+
+  e / eis / ice
+-> dieses Feld ist vereist
+   (Spieler geht ein Feld und versucht nächstes zu betreten)
+
+
+  v
+-> Spieler wird auf das unter diesem Feld befindliche Feld bewegt
+
+  ^
+-> Spieler wird auf das über diesem Feld befindliche Feld bewegt
+
+  <
+-> Spieler wird auf das links neben diesem Feld befindliche Feld bewegt
+
+  >
+-> Spieler wird auf das rechts neben diesem Feld befindliche Feld bewegt
+
+
+  drehelinks
+-> Spieler wird nach links gedreht (Westen)
+
+  dreherechts
+-> Spieler wird nach rechts gedreht (Osten)
+
+  dreheoben
+-> Spieler wird nach oben gedreht (Norden)
+
+  dreheunten
+-> Spieler wird nach unten gedreht (Süden)
+
+  links
+-> Wie wenn der Spieler die linke Pfeiltaste drückt
+
+  rechts
+-> Wie wenn der Spieler die rechte Pfeiltaste drückt
+
+  oben
+-> Wie wenn der Spieler die obere Pfeiltaste drückt
+
+  unten
+-> Wie wenn der Spieler die untere Pfeiltaste drückt
+
+
+  open(landschaft,(x,y))
+-> Öffnet die angegebene Landschaft am Punkt (x,y)
+   (Koordinaten eines Punktes werden im Editor angezeigt bei linksklick)
+
+  goto(x,y) / goto((x,y))
+-> bewegt den Spieler in der aktuellen Landschaft an den Punkt (x,y)
+
+
+  var(varname)
+-> wird durch den Wert der Variable varname ersetzt
+
+  varset(varname=wert)
+-> setz den Wert der Variable varname auf wert
+
+  wenn(wertodervariable1=wertodervariable2,dann,sonst)
+-> vergleicht Werte und/oder Variablen und führt entweder dann oder sonst aus
+   (zB.: wenn(var(name)=odie,text(das~ist~aber~ein~komischer~name),nichts)
+
+
+  nichts
+-> macht nichts
+
+  text(text)
+-> schreibt text zB.: text(hallo~var(name))
+   (es muss ~ statt leerzeichen verwendet werden -> ab 1.8 nicht mehr)
+
+  timer(Sekunden,Befehl)
+-> führt Befehl aus, wenn man die entsprechende Anzahl von Sekunden
+   (Kommazahlen mit Punkt statt Komma) stehen bleibt
+
+  sound(soundfile)
+-> spielt einen Sound ab
+
+  bild(bildname.etc)
+-> zeigt Bild an
+
+  dialog(possib1,possib2,possib3,possib4,...,|,id,lock_moving)
+-> Auswahl zwischen den gegebenen Möglichkeiten -> erzeugt Dialog Event
+   keine Bewegung möglich während Auswahl, wenn lock_moving = true
+
+  text(text,id)
+-> gibt Dialog Event mit CHOICE = ESC zurück wenn fertig gelesen
+
+
+Anmerkung:
+  ! keine Leerzeichen in Befehlen verwenden (außer Text ab Sh1.8)
+  ! geschachtelte Befehle sind erlaubt
+  ! Die vordefinierten Variablen nicht ändern
+
+Vordefinierte Variablen:
+  type: Typ des Objektes
+  name: Name des Objekts
+  richtung: Blickrichtung des Objekts in Grad
+  lesegeschwindigkeit: Geschwindigkeit der Anzeige von Texten
+  volume: Lautstärke
+  position: Position des Objekts (x,y,z)
+  target-position: Wo sich das Objekt gerade hinbewegt (Wenn dieser Wert nicht mit der Position übereinstimmt werden weitere Laufactionen geblockt)
+  velocity: Geschwindigkeit mit x,y,z für freies Laufen
+  max_speed: Geschwindigkeit mit der sich das Objekt maximal bewegen darf
+  landschaft: Name der aktuellen Landschaft
+  movetype: Art sich zu bewegen (grid)
+  viewdistance: Wie viele Blöcke weit geschaut wird
+  maxviewdistance: Wie viele Blöcke weit maximal geschaut werden darf
+  viewdirection: Himmelsrichtung aus der geguckt wird (in Grad)
+  load: Wann das Objekt geladen werden soll (none/always)
+  inherit: Name eines Objektes dessen Attribute überprüft werden sollen wenn dieses Objekt ein gesuchtes Attribut nicht besitzt
+  loopaction: Krötbefehl, der jeden tick einmal ausgeführt wird
+  events: liste von objekten, die bedingung und action haben
+  mode: walk/dialog/write
+
+  actions: Nächste Aktionen des Objekts -> eigenes Objekt dafür (darin sortiert nach objekten + timer + fieldtimer(wird deaktiviert beim verlassen dieses Feldes))
+
+Befehl:
+Feldeigenschaften (mit Umgebungsvariablen):
+	enter
+	leave
+	turn
+	hitbox
+	input
+
+
+Tastenbelegung:
+	Name				mode:	walk		dialog		write
+
+	Maus/Joystick		---------steuert Mausposition--------
+	hoch-runter Pfeiltasten 	MOVE		auswahl		virtuelle Tastatur öffnen
+	links-rechts Pfeiltasten	MOVE		switch		cursorposition
+	Action						ACTION		DIALOG n	INPUT text
+	Back						BACK		DIALOG -1	buchstaben löschen
+	Toggle				---------wechselt Eingabemodus-------
+	Mouseclick					CLICK		DIALOG x	alles halt
+
+	Tastenbelegung für sonstige Events frei wählbar
+		Namen in game object gelistet
+		keyup/down
+		mousepos mit übermitteln
+
+EVENTS:
+	mit speziellen Parametern:
+		MOVE *args (normally x,y)
+		DIALOG id, choice
+		INPUT input
+		ZOOM scale
+	mit normalen Parametern
+		ACTION
+		BACK
+		CLICK
+		CUSTOM_KEY_n
+
+Shildimon EVENTS
+	MOVEBYMOUSEPOS
+	LEFTHAND
+		keydown
+			other hand in use
+				turn item in other hand
+			other hand not in use
+				item in hand
+					shape of item in hand to mouse
+			hand now in use
+		keyup
+			item in hand
+				try to put item down/
+				try to use on object below
+			no item in hand
+				try to take item under mouse
+			hand not in use anymore
+	RIGHTHAND
+	START
+im Inventar:
+	Linke Hand		-> nimmt Item in linke Hand oder legt Item aus linker Hand ab
+	Rechte Hand		-> dito
+	jeweils andere Hand während schon eine Hand gedrückt ist -> Item drehen
+	Action			-> in Item hinein gehen
+	Back			-> aus Item wieder raus gehen
+	Start			-> Menü öffnen, in dem man sich Beschreibung anzeigen lassen kann

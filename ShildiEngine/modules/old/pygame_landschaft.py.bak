@@ -1,0 +1,920 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import ConfigParser
+import pygame, sys, random#, pygame.font
+import pygame.locals as pgl
+import time
+from os import sep as sep
+from string import printable
+printable=unicode(printable.replace("\n","").replace("\r","").replace("\t",""))+u"ÄÖÜäöüß"
+
+class player(object):
+    def __init__(self,landschaft,path,northimage,eastimage,southimage,westimage):
+        self.landschaft = landschaft
+        self.path=path
+        self.standartimagepaths = [northimage,eastimage,southimage,westimage]
+        self.northimage = pygame.image.load(path+northimage)
+        self.eastimage  = pygame.image.load(path+eastimage)
+        self.southimage = pygame.image.load(path+southimage)
+        self.westimage  = pygame.image.load(path+westimage)
+        self.northcloth = None
+        self.eastcloth  = None
+        self.southcloth = None
+        self.westcloth  = None
+        self.cloth = self.southcloth
+        self.Image = self.southimage
+        self.direction = "south"
+        self.Rect = pygame.Rect(
+            (landschaft.WINDOWWIDTH-self.Image.get_size()[0])/2.0,
+            (landschaft.WINDOWHEIGHT-self.Image.get_size()[1])/2.0-20,
+            50,50)
+        
+    def update(self):
+        self.landschaft.windowSurface.blit(self.Image, self.Rect)
+        if self.cloth:
+            self.Clothrect=self.Rect.copy()
+            self.Clothrect.y=self.Rect.y-5
+            self.landschaft.windowSurface.blit(self.cloth,self.Clothrect)
+
+    def reaktionslaufen(self, action):
+        if action[:6]=="shape(":
+            if action[6:-1] == "":
+                northimage,eastimage,southimage,westimage\
+                    = self.standartimagepaths
+            else:
+                northimage,eastimage,southimage,westimage\
+                    = action[6:-1].split(",")
+            self.northimage = pygame.image.load(self.path+northimage)
+            self.eastimage  = pygame.image.load(self.path+eastimage)
+            self.southimage = pygame.image.load(self.path+southimage)
+            self.westimage  = pygame.image.load(self.path+westimage)
+            self.Rect = pygame.Rect(
+            (self.landschaft.WINDOWWIDTH-self.Image.get_size()[0])/2.0,
+            (self.landschaft.WINDOWHEIGHT-self.Image.get_size()[1])/2.0-20,
+            50,50)
+            return "none"
+
+    def looknorth(self):
+        self.Image = self.northimage
+        self.cloth = self.northcloth
+        self.direction = "north"
+
+    def lookeast(self):
+        self.Image = self.eastimage
+        self.cloth = self.eastcloth
+        self.direction = "east"
+
+    def looksouth(self):
+        self.Image = self.southimage
+        self.cloth = self.southcloth
+        self.direction = "south"
+
+    def lookwest(self):
+        self.Image = self.westimage
+        self.cloth = self.westcloth
+        self.direction = "west"
+
+    def setitems(self,items,itemdir):
+        kleidung = []
+        def findekleidung(inventar,kleidung):
+            for key in inventar.keys():
+                if inventar[key][1] != {}:
+                    kleidung=findekleidung(inventar[key][1],kleidung)
+                kleidung.append(inventar[key][0][:-1])
+            return kleidung
+        kleidungsslots = {}
+        for a,b in items.items():
+            if a in [(7,1), (1,6), (7,7), (13,6),(1,14), (7,13), (13,14)]:
+                kleidungsslots[a]=b
+        #kleidungsslots = {a:b for a,b in spieler.items.items() if a in [(7,1), (1,6), (7,7), (13,6),(1,14), (7,13), (13,14)]}
+        self.kleidung=findekleidung(kleidungsslots,kleidung)
+        print self.kleidung
+        self.cloth = pygame.Surface((self.Rect.width,self.Rect.height)).convert_alpha()
+        self.cloth.fill((0,0,0,0))
+        self.northcloth = pygame.Surface((self.Rect.width,self.Rect.height)).convert_alpha()
+        self.northcloth.fill((0,0,0,0))
+        self.eastcloth  = pygame.Surface((self.Rect.width,self.Rect.height)).convert_alpha()
+        self.eastcloth.fill((0,0,0,0))
+        self.southcloth = pygame.Surface((self.Rect.width,self.Rect.height)).convert_alpha()
+        self.southcloth.fill((0,0,0,0))
+        self.westcloth  = pygame.Surface((self.Rect.width,self.Rect.height)).convert_alpha()
+        self.westcloth.fill((0,0,0,0))
+        for item in self.kleidung:
+            print item
+            x,y=0,0
+            self.northcloth.blit(pygame.image.load(itemdir+item+sep+"north.png"),(x,y))
+            self.eastcloth.blit(pygame.image.load(itemdir+item+sep+"east.png"),(x,y))
+            self.southcloth.blit(pygame.image.load(itemdir+item+sep+"south.png"),(x,y))
+            self.westcloth.blit(pygame.image.load(itemdir+item+sep+"west.png"),(x,y))
+        self.cloth={"north":self.northcloth,"east":self.eastcloth,
+                    "south":self.southcloth,"west":self.westcloth}[self.direction]
+
+class Simple_objekt(object):
+    def __init__(self,data,pos,landschaft):
+        self.data = data
+        self.landschaft = landschaft
+        self.bgimagelist = []
+        self.fgimagelist = []
+        self.fpfgimagelist = [] #forpersonforground
+        # BGLADEN
+        if data["background"][-4:]==".png":
+            if data["background"] not in self.landschaft.images.keys():
+                self.landschaft.images[data["background"]]=pygame.image.load(
+                    self.landschaft.imagepaths[data["background"]])
+            self.bgImage = data["background"]
+        elif data["background"][-4:]==".cfg":
+            # configleser erstellen
+            self.configleser = ConfigParser.ConfigParser()
+            self.configleser.read(self.landschaft.imagepaths[data["background"]])
+            self.bgimagelist=self.configleser.items("normal")
+            self.bgimagelist.sort()
+            for dummi,image in self.bgimagelist:
+                if image not in self.landschaft.images.keys():
+                    self.landschaft.images[image]=pygame.image.load(
+                        self.landschaft.imagepaths[image])
+        else:
+            print "FiletypeError in Field"+str(pos)
+        # FGLADEN
+        if data["file"][-4:]==".png":
+            if data["file"] not in self.landschaft.images.keys():
+                self.landschaft.images[data["file"]]=pygame.image.load(
+                    self.landschaft.imagepaths[data["file"]])
+            self.fgImage = data["file"]
+        elif data["file"][-4:]==".cfg":
+            # configleser erstellen
+            self.configleser = ConfigParser.ConfigParser()
+            self.configleser.read(self.landschaft.imagepaths[data["file"]])
+            self.fgimagelist=self.configleser.items("normal")
+            self.fgimagelist.sort()
+            for dummi,image in self.fgimagelist:
+                if image not in self.landschaft.images.keys():
+                    self.landschaft.images[image]=pygame.image.load(
+                        self.landschaft.imagepaths[image])
+        else:
+            print "FiletypeError in Field"+str(pos)
+        # FPFGLADEN
+        try:
+            data["forperson"]
+        except:
+            self.fpfgImage=None
+        else:
+            #print("fpfgimage defined")
+            #print self.landschaft.imagepaths[data["forperson"]][-4:]
+            if data["forperson"][-4:]==".png":
+                if data["forperson"] not in self.landschaft.images.keys():
+                    self.landschaft.images[data["forperson"]]=pygame.image.load(
+                        self.landschaft.imagepaths[data["forperson"]])
+                self.fpfgImage = data["forperson"]
+            elif data["forperson"][-4:]==".cfg":
+                # configleser erstellen
+                self.configleser = ConfigParser.ConfigParser()
+                self.configleser.read(self.landschaft.imagepaths[data["forperson"]])
+                bgimagenamelist=self.configleser.items("normal")
+                bgimagenamelist.sort()
+                for image in bgimagenamelist:
+                    image = image[1]
+                    self.fpfgimagelist.append(pygame.image.load(
+                    self.landschaft.imagepaths[image]))
+            else:
+                print "FiletypeError in Field"+str(pos)
+
+        self.pos = list(pos)
+        #print data
+        try:
+            data["hight"]
+        except:
+            self.hight=0
+        else:
+            self.hight=int(data["hight"])
+            print "defined hight"
+        self.Rect = pygame.Rect(pos[0],pos[1]-int(self.hight)*10,50,50)
+        #self.Rect.topleft = self.pos
+        self.update(0,True)
+        
+    def move(self,x,y):
+        self.pos[0]+=x; self.pos[1]+=y
+
+    def update(self,hight,force_update=False):
+        self.Rect.topleft = [self.pos[0],self.pos[1]-int(self.hight-hight)*10]
+        self.force_update = force_update
+        self.Blitrect = self.Rect
+        self.Cliprect = pygame.Rect(0,0,self.Rect.height,self.Rect.width)
+        if self.Rect.collidelist(self.landschaft.changedrects)!=-1:
+            self.force_update = True
+            collidelist=self.Rect.collidelistall(self.landschaft.changedrects)
+            self.Blitrect=self.Rect.clip(self.landschaft.changedrects[collidelist[0]])
+            for i in collidelist[1:]: #nicht range
+                colliderect=self.Rect.clip(self.landschaft.changedrects[i])
+                self.Blitrect=self.Blitrect.union(colliderect)
+            self.Cliprect=pygame.Rect(self.Blitrect.x-self.Rect.x,
+                                      self.Blitrect.y-self.Rect.y,
+                                      self.Blitrect.width,self.Blitrect.height)
+        if self.bgimagelist == []:
+            if self.bgImage != "transparent.png" and self.force_update:
+                self.landschaft.windowSurface.blit(
+                    self.landschaft.images[self.bgImage],
+                    self.Blitrect,self.Cliprect)
+                self.landschaft.changedrects.append(self.Blitrect)
+        else:
+            self.bgimagelist.append(self.bgimagelist.pop(0))
+            self.landschaft.windowSurface.blit(
+                self.landschaft.images[self.bgimagelist[0][1]],
+                self.Blitrect,self.Cliprect)
+            self.landschaft.changedrects.append(self.Blitrect)
+            self.force_update = True
+        if self.fgimagelist == []:
+            if self.fgImage != "transparent.png" and self.force_update:
+                self.landschaft.windowSurface.blit(
+                    self.landschaft.images[self.fgImage],
+                    self.Blitrect,self.Cliprect)
+                self.landschaft.changedrects.append(self.Blitrect)
+        else:
+            self.fgimagelist.append(self.fgimagelist.pop(0))
+            self.landschaft.windowSurface.blit(
+                self.landschaft.images[self.fgimagelist[0][1]],
+                self.Blitrect,self.Cliprect)
+            self.landschaft.changedrects.append(self.Blitrect)
+            self.force_update = True
+    
+    def fgupdate(self,hight):
+        #self.Rect.topleft und self.force_update = schon von update() initialisiert
+        if not self.fpfgImage:
+            pass
+        elif self.fpfgimagelist == [] and self.force_update:
+            self.landschaft.windowSurface.blit(
+                self.landschaft.images[self.fpfgImage],
+                self.Rect)
+            self.landschaft.changedrects.append(self.Rect)
+        elif self.force_update:
+            self.fpfgimagelist.append(self.fpfgimagelist.pop(0))
+            self.landschaft.windowSurface.blit(self.fpfgimagelist[0], self.Rect)
+            self.landschaft.changedrects.append(self.Rect)
+
+
+
+
+class Complex_objekt(object):
+    def __init__(self,data,name,landschaft):
+        self.data = data
+        self.name = name
+        #print data
+        self.landschaft = landschaft
+        self.Image = pygame.image.load(
+            self.landschaft.objektpaths[data["bild"]])
+        self.Rect = self.Image.get_rect()
+        self.xpos = int(self.data["position"].split(",")[0][1:])*50
+        self.ypos = int(self.data["position"].split(",")[1][:-1])*50
+        self.pos = [self.xpos,self.ypos]
+        self.Rect.topleft = self.pos
+
+    def move(self,x,y):
+        self.pos[0]+=x; self.pos[1]+=y
+        self.Rect.topleft = self.pos
+
+    def update(self,hight,force_update):
+        self.landschaft.windowSurface.blit(self.Image, self.Rect)
+
+    def fgupdate(self,hight):
+        pass
+
+    def reaktionslaufen(self, action):
+        #print "reactionrun:",action
+        #print action[:6]
+        if action[:6]=="shape(":
+            #print action[6:-1]
+            if action[6:-1]!=self.data["bild"]:
+                self.data["bild"]=action[6:-1]
+                self.Image = pygame.image.load(
+                    self.landschaft.objektpaths[self.data["bild"]])
+                self.Rect = self.Image.get_rect()
+                self.Rect.topleft=self.pos
+            return "none"
+        elif action[:5]=="move(":
+            x = int(action[5:-1].split(",")[0])*50
+            y = int(action[5:-1].split(",")[1])*50
+            self.landschaft.cobjektsbypos.pop((((self.xpos+25-self.landschaft.size[0]/2)*-1)/50,
+                            (self.ypos+25-self.landschaft.size[1]/2)/50))
+            self.xpos+=x
+            self.ypos+=y
+            self.landschaft.cobjektsbypos[(((self.xpos+25-self.landschaft.size[0]/2)*-1)/50,
+                            (self.ypos+25-self.landschaft.size[1]/2)/50)]=self
+            self.move(x,y)
+            return "none"
+        elif action[:9]=="setlight(":
+            self.data["light"]=action[9:-1]
+        
+class pygame_landschaft():
+    def __init__(self,datafile,landschaftsfile=None,title="MCGEM",width=400,height=400,fullscreen=False,screenobject=None):
+        print("initialising pygame_landschaft")
+        self.configleser = ConfigParser.ConfigParser()
+        self.datafile = datafile+"Landschaftssegmente"+os.sep
+        self.fontfile = datafile[:datafile[:datafile.rfind(sep)].rfind(sep)+1]+"Fonts%sArtifika.ttf" %sep
+        #print self.fontfile
+        self.textbgfile = datafile+"other"+os.sep+"redefenster.gif"
+        self.pos = (0,0)
+        self.landschaftsfile = landschaftsfile
+        self.landschaftsname = None
+        self.simpleobjekts = []
+        self.complexobjekts = {}
+        self.kaestcheneigenschaften = {}
+        self.kaestchenitems = {}
+        self.cobjektsbypos = {}
+        self.adsurface = None
+        self.light = 255 #of 0-255 or -1 ("daylight")
+        self.playerlight = (100,255)
+        self.textinput = ""
+        self.FULLSCREEN = fullscreen
+        self.cyclecount = 0
+        self.changedrects = []
+        self.textlines = ["Zeile 1","Zeile 2"]
+        self.textpointer = 0
+        self.showtext = True
+        self.reaktionslaufen = lambda x:None
+
+        # set up pygame
+        pygame.init()
+        self.mainClock = pygame.time.Clock()
+        self.fpstimelist = [0]*9+[time.time()]
+        
+        # set up the window
+        self.WINDOWWIDTH = width
+        self.WINDOWHEIGHT = height
+        if screenobject:
+            self.windowSurface = screenobject
+        else:
+            if fullscreen:
+                self.windowSurface = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT),pygame.FULLSCREEN)
+            else:
+                self.windowSurface = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT),1,32)
+        self.title=title
+        pygame.display.set_caption(self.title)
+        self.map = self.windowSurface.copy()
+
+        # Bindingslisten
+        self._keydown_bindings = {}
+        self._keyup_bindings = {}
+        self._keylist_bindings = {}
+        self._strg = False
+        self._keylist = []
+
+        self.imagepaths = {}
+        self.images={}
+        self.player = None
+        def lies(path):
+            for datei in os.listdir(path):
+                if os.path.isdir(path+datei):
+                    lies(path+datei+os.path.sep)
+                else:
+                    self.imagepaths[datei] = path+datei
+            #return self.imagepaths
+        dfs = lies(self.datafile)
+        #print dfs
+        self.objektpaths = {}
+        self.player = None
+        def lies(path):
+            for datei in os.listdir(path):
+                if os.path.isdir(path+datei):
+                    lies(path+datei+os.path.sep)
+                else:
+                    self.objektpaths[datei] = path+datei
+            #return self.objektpaths
+        dfs = lies(self.datafile[:self.datafile[:-1].rindex(os.path.sep)+1])
+        #print dfs
+
+        if landschaftsfile != None:
+            self.landschaft(landschaftsfile)
+
+    def landschaft(self,landschaftsfile):
+        self.pos = (0,0)
+        self.intpos = (0,0)
+        self.simpleobjekts=[]
+        self.complexobjekts={}
+        self.kaestcheneigenschaften={}
+        self.kaestchenitems={}
+        self.cobjektsbypos={}
+
+        self.landschaftsfile = landschaftsfile
+        # configleser leeren
+        for i in self.configleser.sections():
+            self.configleser.remove_section(i)
+        # configleser neu einlesen
+        self.configleser.read(self.landschaftsfile)
+        #print self.configleser.sections()
+
+        self.eigenschaften = dict(self.configleser.items("Eigenschaften"))
+        self.size = (int(self.eigenschaften["size"][1:-1].split(",")[0])*50,
+                     int(self.eigenschaften["size"][1:-1].split(",")[1])*50)
+        self.landschaftsname=self.eigenschaften["name"]
+        self.light= int(self.eigenschaften.get("light",255))
+
+        for section in self.configleser.sections():
+            #print section
+            if section == "Eigenschaften":
+                pass
+            elif section[:6]=="objekt":
+                objekt = Complex_objekt(dict(self.configleser.items(section)),section[7:],self)
+                #print objekt.data
+                xpos = int(objekt.data["position"].split(",")[0][1:])*50
+                ypos = int(objekt.data["position"].split(",")[1][:-1])*50
+                #print xpos,ypos
+                self.complexobjekts[section[7:]] = objekt
+                self.cobjektsbypos[(((xpos+25-self.size[0]/2)*-1)/50,
+                            (ypos+25-self.size[1]/2)/50)] = self.complexobjekts[section[7:]]
+            else:
+                tile = dict(self.configleser.items(section))
+                pos = (int(section.split(",")[0])*50,
+                       int(section.split(",")[1])*50)
+                #Shildimonkaestcheneigenschaftenformat:
+                #  nullpunkt in mitte,seitenverkehrt(horizontal+vertikal)
+                self.kaestcheneigenschaften[(((pos[0]+25-self.size[0]/2)*-1)/50,
+                            (pos[1]+25-self.size[1]/2)/50)] = tile["action"]
+                self.kaestchenitems[(((pos[0]+25-self.size[0]/2)*-1)/50,
+                            (pos[1]+25-self.size[1]/2)/50)] = tile
+                self.simpleobjekts.append(Simple_objekt(tile,pos,self))
+        self.windowSurface.fill((0,0,0))
+
+    def update(self,adsurface=None,show=True,objactfunc=None,force_update=False):
+        self.reaktionslaufen=objactfunc
+        self.cyclecount+=1
+        tlist=[]
+        t=time.time()
+        if adsurface==None:
+            adsurface=self.adsurface
+        elif adsurface==False:
+            adsurface=None
+        else:
+            self.adsurface=adsurface
+        if objactfunc:
+            for obj in self.complexobjekts.values():
+                #print obj.data["loopfunction"]
+                objactfunc(obj.data["loopfunction"])
+        #herausbekommen, welches objekt am nächsten zu (0,0) ist
+        nearest=(1000,0) #(maximaler Sichtradius, Ausgangshöhe)
+        for objekt in self.simpleobjekts:
+            if abs(objekt.pos[0]+25-self.WINDOWWIDTH/2
+                   )+abs(objekt.pos[1]+25-self.WINDOWHEIGHT/2)<nearest[0]:
+                nearest=(abs(objekt.pos[0]+25-self.WINDOWWIDTH/2
+                   )+abs(objekt.pos[1]+25-self.WINDOWHEIGHT/2),objekt.hight)
+        #print nearest
+        tlist.append(time.time()-t)
+        t = time.time()
+        internalcyclecount=self.cyclecount%16
+        for objekt in self.simpleobjekts + self.complexobjekts.values():
+            if not force_update:
+                objekt.update(nearest[1],internalcyclecount==0) #Hight
+            else:
+                objekt.update(nearest[1],True)
+            internalcyclecount+=1
+            if internalcyclecount > 15:
+                internalcyclecount-=16
+        tlist.append(time.time()-t)
+        t = time.time()
+        for objekt in self.simpleobjekts + self.complexobjekts.values():
+            objekt.fgupdate(nearest[1]) #HIGHT
+        tlist.append(time.time()-t)
+        t = time.time()
+        if show:
+            x,y = self.pos
+            self.map.blit(self.windowSurface,(x,y),(x,y,self.size[0],self.size[1]))
+        tlist.append(time.time()-t)
+        t = time.time()
+        if show:
+            self.decoration(adsurface)
+        tlist.append(time.time()-t)
+        t = time.time()
+        if show:
+            pygame.display.update()
+        tlist.append(time.time()-t)
+        t = time.time()
+        if show:
+            x,y = self.pos
+            self.windowSurface.fill((0,0,0)) #Verbraucht relativ viel Leistung
+            self.windowSurface.blit(self.map,(x,y),(x,y,self.size[0],self.size[1]))
+            tlist.append(time.time()-t)
+        #print self.changedrects
+        self.changedrects=[]
+        return tlist
+
+    def decoration(self,adsurface=None):
+        if self.player:
+            self.player.update()
+        if self.light != 255:
+                lightmap = pygame.Surface((800,480),pgl.SRCALPHA)
+                #lightmap = lightmap.convert_alpha(self.windowSurface)
+                lightmap.fill((0,0,0,255-self.light))
+                lights = [(self.playerlight[0],self.playerlight[1],
+                           (self.WINDOWWIDTH/2.0,self.WINDOWHEIGHT/2.0))]
+                for objekt in self.simpleobjekts:
+                    if objekt.data.has_key("light"):
+                        level = int(objekt.data["light"].split(",")[0])
+                        radius= int(objekt.data["light"].split(",")[1])
+                        pos = (objekt.pos[0]+25,objekt.pos[1]-int(objekt.hight)*10+25)
+                        lights.append((level,radius,pos))
+                for objekt in self.complexobjekts.values():
+                    if objekt.data.has_key("light"):
+                        level = int(objekt.data["light"].split(",")[0])
+                        radius= int(objekt.data["light"].split(",")[1])
+                        pos = (objekt.pos[0]+25,objekt.pos[1]+25)
+                        lights.append((level,radius,pos))
+                lights.sort()
+                for level,radius,(x,y) in lights:
+                    if level > self.light:
+                        #testi = pygame.Surface((radius*2,radius*2),pgl.SRCALPHA)
+                        #pygame.draw.circle(testi,(0,0,0,255-level),(radius,radius),radius)
+                        #lightmap.blit(testi,(x-radius,y-radius))
+                        pygame.draw.circle(lightmap,(0,0,0,255-level),(int(x),int(y)),radius)
+                self.windowSurface.blit(lightmap,(0,0))
+        if adsurface:
+            self.windowSurface.blit(adsurface,(0,0))
+        fpsaverage=len(self.fpstimelist)/(self.fpstimelist[-1]-self.fpstimelist.pop(0))
+        self.fpstimelist.append(time.time())
+        font = pygame.font.Font(self.fontfile, 20)
+        fpsimage = font.render(str(int(fpsaverage+0.5)), 1, (255, 0, 0))
+        self.windowSurface.blit(fpsimage, fpsimage.get_rect(x=self.WINDOWWIDTH-25,y=0))
+        if self.showtext:
+            self.blittext()
+        if self.textinput:
+            self.blittextinput()
+
+    def quit(self):
+        pygame.quit()
+        del(self)
+
+    def onkey(self, func, key):
+        """Bind an action to a key press event"""
+        if type(key) in (str,unicode) and len(key) == 1:
+            if key in printable:
+                key = key
+            else:
+                key = ord(key)
+        self._keydown_bindings[key] = func
+        
+    def onkeyrelease(self, func, key):
+        """Bind an action to a key release event"""
+        if type(key) == str and len(key) == 1:
+            key = ord(key)
+        self._keyup_bindings[key] = func
+
+    def onkeylist(self, func, keylist):
+        """Bind an action to a list of keys pressed while Strg hold"""
+        for i in range(len(keylist)):
+            if type(keylist[i]) == str and len(keylist[i]) == 1:
+                keylist[i] = ord(keylist[i])
+        self._keylist_bindings[tuple(keylist)] = func
+    
+    def speed(self,speed):
+        self.speed = speed
+
+    def move(self,x,y,FPS=16,speed=10):
+        startpos=[i for i in self.pos]
+        maxxy=max(abs(int(x)),abs(int(y)))/speed
+        if maxxy==0:
+            return
+        for i in range(1,maxxy+1):
+            self.pos=(startpos[0]+x*i/maxxy,startpos[1]-y*i/maxxy)
+            #print x,i,maxxy,x*i/maxxy,self.pos[0],
+            self.scrollscreen()
+            for objekt in self.simpleobjekts + self.complexobjekts.values():
+                objekt.move(x/maxxy,-y/maxxy)
+            self.loop()
+            self.update()
+            self.mainClock.tick(FPS)
+        self.pos=(startpos[0]+x,startpos[1]-y)
+        self.scrollscreen()
+        for objekt in self.simpleobjekts + self.complexobjekts.values():
+            objekt.move(x-(x/maxxy)*maxxy,-y+(y/maxxy)*maxxy)
+            
+    def goto(self,x,y):
+        x = x + self.WINDOWWIDTH/2.0-self.size[0]/2.0
+        y =-y + self.WINDOWHEIGHT/2.0-self.size[0]/2.0
+        a = x - self.pos[0]
+        b = y - self.pos[1]
+        self.pos = (x,y)
+        self.scrollscreen()
+        for objekt in self.simpleobjekts + self.complexobjekts.values():
+            objekt.move(a,b)
+
+    def scrollscreen(self):
+        inta=int(self.pos[0]-self.intpos[0])
+        intb=int(self.pos[1]-self.intpos[1])
+        self.intpos = (self.intpos[0]+inta,self.intpos[1]+intb)
+        try:
+#            FEHLER
+            self.windowSurface.scroll(inta,intb) #pygame1.9Feature
+        except:
+            self.windowSurface.blit(self.windowSurface,(inta,intb))
+        self.changedrects=[rect.move(inta,intb) for rect in self.changedrects]
+        if inta>0:
+            rect=pygame.Rect(0,0,inta,self.WINDOWHEIGHT)
+            self.changedrects.append(rect)
+            pygame.draw.rect(self.windowSurface,(0,0,0),rect)
+        if inta<0:
+            rect=pygame.Rect(self.WINDOWWIDTH+inta,0,-inta,self.WINDOWHEIGHT)
+            self.changedrects.append(rect)
+            pygame.draw.rect(self.windowSurface,(0,0,0),rect)
+        if intb>0:
+            rect=pygame.Rect(0,0,self.WINDOWWIDTH,intb)
+            self.changedrects.append(rect)
+            pygame.draw.rect(self.windowSurface,(0,0,0),rect)
+        if intb<0:
+            rect=pygame.Rect(0,self.WINDOWHEIGHT+intb,self.WINDOWWIDTH,-intb)
+            self.changedrects.append(rect)
+            pygame.draw.rect(self.windowSurface,(0,0,0),rect)
+
+
+    def tellpos(self):
+        return (self.pos[0]-self.WINDOWWIDTH/2.0+self.size[0]/2.0,
+                -self.pos[1]+self.WINDOWHEIGHT/2.0-self.size[1]/2.0)
+
+    def showimage(self, imagepath):
+        self.windowSurface.fill((0,0,0))
+        image=pygame.image.load(imagepath)
+        self.windowSurface.blit(image,(0,0))
+        pygame.display.update()
+        beenden=False
+        while not beenden:
+            for event in pygame.event.get():
+                if event.type == pgl.QUIT:
+                    beenden=True
+                if event.type == pgl.KEYUP:
+                    beenden=True
+            pygame.display.update()
+
+    def auswahl(self,liste,FPS=16):
+        pointer = 0
+        self.showtext = True
+        if self.textlines[-1]!="":
+            self.textlines.append("")
+        self.textpointer = len(self.textlines)
+        textpointerstart = self.textpointer
+        for i in range(len(liste)):
+            self.textlines.append(liste[i])
+        x,y=self.WINDOWWIDTH/2.0-165, self.WINDOWHEIGHT-148-50
+        beenden = False
+        downpressed=False
+        uppressed=False
+        speed = 0
+        pygame.event.get()
+        while not beenden:
+            for event in pygame.event.get():
+                if event.type == pgl.QUIT:
+                    beenden=True
+                if event.type in (pgl.KEYDOWN, pgl.KEYUP):
+                    if event.key == pgl.K_PAGEUP:
+                        uppressed = event.type == pgl.KEYDOWN
+                    elif event.key == pgl.K_PAGEDOWN:
+                        downpressed = event.type == pgl.KEYDOWN
+                    elif event.type == pgl.KEYDOWN:
+                        if event.key == pgl.K_RETURN:
+                            beenden=True
+                        else:
+                            pointer+=(event.key==pgl.K_DOWN)-(event.key==pgl.K_UP)
+                            pointer = pointer % len(liste)
+                            if textpointerstart-self.textpointer+pointer<0:
+                                self.textpointer=textpointerstart+pointer
+                            if textpointerstart-self.textpointer+pointer>4:
+                                self.textpointer=textpointerstart+pointer-4
+            speed=speed*0.9
+            if uppressed:
+                speed-=0.1
+            elif downpressed:
+                speed+=0.1
+            self.textpointer+=speed
+            self.mainClock.tick(FPS)
+            self.update(show=False)
+            a,b=self.pos
+            self.map.blit(self.windowSurface,(a,b),(a,b,self.size[0],self.size[1]))
+            self.decoration()
+            yd=textpointerstart*22-self.textpointer*22+pointer*22
+            if -22 < yd < 110:
+                pointlist=[(x,y+yd+00),(x+5,y+yd+05),
+                           (x,y+yd+10),(x-5,y+yd+05)]
+                pygame.draw.polygon(self.windowSurface,(0,0,0),pointlist)
+            pygame.display.update()
+            self.windowSurface.blit(self.map,(a,b),(a,b,self.size[0],self.size[1]))
+        self.showtext = False
+        return pointer
+
+    def text(self,text,speed=0.5,FPS=16):
+        self.showtext = True
+        if self.textlines[-1]!="":
+            self.textlines.append("")
+        self.textpointer = len(self.textlines)
+        textpointersoll = self.textpointer
+        self.textlines.append("")
+        font = pygame.font.Font(self.fontfile, 20)
+        returnpressed=False
+        pygame.event.get()
+        scrollspeed=0
+        counter=0
+        for b in text:
+            if self.textlines[-1] == "":
+                x = 0
+            else:
+                x = sum([i[4] for i in list(font.metrics(self.textlines[-1]))])
+            if x>280 or b in ("\n","/n") or (x>240 and b in " -"):
+                if b not in ("\n"," ","/n"):
+                    self.textlines[-1]+="-"
+                self.textlines.append("")
+                if len(self.textlines)-textpointersoll>5:
+                    textpointersoll+=1
+                    #if textpointersoll-self.textpointer>1:
+                        #self.textpointer=textpointersoll-1
+                self.mainClock.tick(FPS)
+                self.update()
+                if b not in ("\n"," ","/n","-"):
+                    self.textlines[-1] += b
+            else:
+                self.textlines[-1] += b
+            for event in pygame.event.get():
+                if event.type==pgl.KEYDOWN:
+                    if event.key==pgl.K_RETURN:
+                        returnpressed=True
+                if event.type==pgl.KEYUP:
+                    if event.key==pgl.K_RETURN:
+                        returnpressed=False
+            scrollspeed*=0.5
+            if textpointersoll-self.textpointer>0.6:
+                scrollspeed+=0.05
+            elif textpointersoll-self.textpointer>0.1:
+                scrollspeed+=0.01
+            else:
+                scrollspeed=0
+                self.textpointer=textpointersoll
+            self.textpointer+=scrollspeed
+            if not returnpressed:
+                counter+=speed
+                while counter>1:
+                    counter-=1
+                    self.mainClock.tick(FPS)
+                    self.update()
+        self.waitforkey(FPS)
+        self.showtext=False
+
+    def blittext(self):
+        font = pygame.font.Font(self.fontfile, 20)
+        textlayer = pygame.Surface((390,198))
+        textlayer = textlayer.convert_alpha()
+        textlayer.fill((0,0,0,0))
+        Rect = (self.WINDOWWIDTH/2.0-195, self.WINDOWHEIGHT-198-50)
+        bgimage = pygame.image.load(self.textbgfile)
+        textlayer.blit(bgimage,(0,0))
+        for i in range(6):
+            linenumber=int(self.textpointer)+i
+            if 0 <= linenumber < len(self.textlines):
+                line = font.render(self.textlines[linenumber], 1, (0, 0, 0))
+                textlayer.blit(line, line.get_rect(x=40,y=(linenumber-self.textpointer)*22+40))
+        self.windowSurface.blit(textlayer,Rect)        
+
+    def blittextinput(self):
+        font = pygame.font.Font(self.fontfile, 20)
+        textlayer = pygame.Surface((390,198))
+        textlayer = textlayer.convert_alpha()
+        textlayer.fill((0,0,0,0))
+        Rect = (self.WINDOWWIDTH/2.0-195, self.WINDOWHEIGHT-50)
+        bgimage = pygame.image.load(self.textbgfile)
+        textlayer.blit(bgimage,(0,0))
+        text = font.render(self.textinput, 1, (0, 0, 0))
+        if text.get_width()>325:
+            self.textinput=self.textinput[:-1]
+            self.blittextinput()
+        else:
+            textlayer.blit(text,(35,25))
+            self.windowSurface.blit(textlayer,Rect)
+
+    def getplayer(self,path,northimage,eastimage,southimage,westimage):
+        print self,path,northimage,eastimage,southimage,westimage
+        self.player = player(self,path,northimage,eastimage,southimage,westimage)
+
+    def waitforkey(self,FPS):
+        beenden=False
+        downpressed=False
+        uppressed=False
+        speed = 0
+        pygame.event.get()
+        while not beenden:
+            for event in pygame.event.get():
+                if event.type == pgl.QUIT:
+                    beenden=True
+                if event.type in (pgl.KEYDOWN, pgl.KEYUP):
+                    if event.key == pgl.K_PAGEUP:
+                        uppressed = event.type == pgl.KEYDOWN
+                    elif event.key == pgl.K_PAGEDOWN:
+                        downpressed = event.type == pgl.KEYDOWN
+                    elif event.type == pgl.KEYDOWN:
+                        beenden = True
+            speed=speed*0.9
+            if uppressed:
+                speed-=0.1
+            elif downpressed:
+                speed+=0.1
+            self.textpointer+=speed
+            self.mainClock.tick(FPS)
+            self.update()
+
+    def loop(self,onlyone=False):
+        pygame.mouse.set_visible(False)
+        beenden=False
+        # check for events
+        events=pygame.event.get()
+        if onlyone and len(events):
+            events=[events[0]]
+            #print "tick"
+        for event in events:
+            if event.type == pgl.QUIT:
+                beenden=True
+            if event.type == pgl.KEYDOWN:
+                if event.key == pgl.K_LCTRL:
+                    self._strg=True
+                elif self._strg:
+                    self._keylist.append(event.key)
+                elif event.key in self._keydown_bindings.keys() or\
+                     event.unicode in self._keydown_bindings.keys():
+                    if event.unicode and event.unicode in printable:
+                        self._keydown_bindings[event.unicode]()
+                    else:
+                        self._keydown_bindings[event.key]()
+                    
+            if event.type == pgl.KEYUP:
+                if event.key == pgl.K_LCTRL:
+                    self._strg=False
+                    if tuple(self._keylist) in self._keylist_bindings.keys():
+                        self._keylist_bindings[tuple(self._keylist)]()
+                    self._keylist=[]
+                elif self._strg:
+                    pass
+                elif event.key in self._keyup_bindings.keys():
+                    self._keyup_bindings[event.key]()
+                    
+            if event.type == pgl.MOUSEBUTTONUP:
+                pass
+
+            if event.type == pgl.MOUSEMOTION:
+                self.mousepos = event.pos
+        return not beenden
+
+
+if __name__ == "__main__":
+    verzeichnis1 = "/home/joram/Shildiwelt1.8/data/Objekte/"
+    verzeichnis2= "../data/Objekte/"
+
+    pygame.init()
+    screen=pygame.display.set_mode((800,480))
+                                   #,pygame.FULLSCREEN)
+    landi = pygame_landschaft(verzeichnis2,
+                              width=800,
+                              height=480,screenobject=screen)
+    landi.landschaft(
+#        "../data/Landschaften/testpnglandschaft.shl",)
+#         "../data/Landschaften/garten.shl",)
+#        "../data/Landschaften/kanalisation.shl",)
+#        "../data/Landschaften/wald.shl",)
+        "../data/Landschaften/schuppen.shl",)
+
+
+    landi.speed(10)
+    #print landi.kaestcheneigenschaften
+    landi.move(100,-100)
+    
+    #landi.getplayer(verzeichnis1,
+    #                "Trainer/Charlie.gif",
+    #                "Trainer/Charlie.gif",
+    #                "Trainer/Charlie.gif",
+    #                "Trainer/Charlie.gif")
+    
+    FPS=16
+    x=0
+    import math, time
+    tlistlist=[]
+    #landi.move(-150,0)
+    while landi.loop():
+        x+=0.2
+        landi.goto(math.sin(x)*50+50,math.cos(x)*50)
+        #landi.move(math.sin(x)*22,0)
+        landi.light=int((math.sin(x/5)+1)*128)
+        t = time.time()
+        tlist=landi.update()
+        tlist.append(time.time()-t)
+        tlist.append(1/(time.time()-t))
+        tlistlist.append(tlist)
+        #landi.mainClock.tick(FPS)
+        #print landi.tellpos()
+    #landi.text(
+        u"""Herzlich willkommen.
+Shildimon ist ein freies Adventure- / Strategiespiel,
+bei welchem man die Rolle eines Charakters übernimmt,
+Landschaften erforscht und Rätsel löst.
+Es spielt auf dem fiktiven Planeten Teku.
+Shildimon ist ein freies und in Python verfasstes Programm,
+welches sich momentan noch in der Entstehungsphase befindet.
+"""
+    #    )
+
+    for i in range(len(tlistlist[0])):
+        print sum([tlist[i]/len(tlistlist) for tlist in tlistlist]),
+    landi.textinput="Hallo Welt! 123456789123456789123456789"
+    landi.text(u"tschüss")
+    print landi.auswahl(["ja","nein","vielleicht","1","2","3","4","5","6"])
+    landi.quit()

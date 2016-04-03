@@ -1,0 +1,973 @@
+[Eigenschaften]
+music = forestmap.ogg
+name = wald
+size = (13, 13)
+light = 100
+initaction=(wenn(var(kerzeda)=None,kerze.shape(grablichtan.png),(kerze.shape(grablichtaus.png),kerze.setlight(0,0))),wenn(var(schaufelda)=None,schaufel.shape(schaufel.png),schaufel.shape(transparent.png)),wenn(var(gullida)=None,gulli.shape(transparent.png),gulli.shape(waldbodengulli.png)),wenn(var(schluessel)=da,schluessel.shape(schluessel.png),schluessel.shape(transparent.png)),wenn(var(huette)=None,huette.shape(erdhuegel.png),huette.shape(huette.png)),wenn(var(buschweg)=None,,gebuesch.move(0,-1)))
+
+[0, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 11]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 10]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 9]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 8]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 7]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 6]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 5]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 4]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 3]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 2]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 1]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[0, 0]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[1, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[1, 11]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[1, 10]
+background = grab.png
+file = transparent.png
+action = text("Hier ist ein Grab. Aber die Schrift ist so verwittert, dass man sie nicht mehr lesen kann.")
+hand = wenn(var(kerzeda)=None,getitem(Kerze,(varset(kerzeda=False),kerze.shape(grablichtaus.png),kerze.setlight(0,0))),)
+Kerze = removeitem(Kerze,(varset(kerzeda=None),kerze.shape(grablichtan.png),kerze.setlight(150,125)))
+
+[1, 9]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[1, 8]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[1, 7]
+background = waldboden.png
+file = nadelbaumuntenharz.png
+action = wenn(var(harz)=None,text("Da ist ein Ast mit viel Harz dran, aber ich brauche etwas kleines spitzes um ihn abzubekommen."),text(Da ist nicht mehr viel Harz.))
+Nagel = wenn(var(harz)=None,(removeitem(Nagel),getitem(verharzter_Ast,(varset(harz=weg),text("Ob man mit dem Harz wohl so etwas wie zum Beispiel zwei Bretter zusammenkleben kann? Dazu müsste ich bloß noch mal zu dem schönen Stein in meinem Garten.")))))
+
+[1, 6]
+background = waldboden.png
+file = transparent.png
+action = .
+forperson = nadelbaumoben.png
+
+[1, 5]
+background = waldboden.png
+file = transparent.png
+action = wenn(var(huette)=None,text("Ein komischer Erdhügel."))
+Schaufel = wenn(var(huette)=None,(varset(huette=da),huette.shape(huette.png),text("Unter dem Erdhaufen war eine verfallene kleine Holzhütte.)))
+Hand = wenn(var(huette)=da,getitem(Brett_mit_Nagel,varset(huette=leer)))
+
+[1, 4]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[1, 3]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[1, 2]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[1, 1]
+background = waldboden.png
+file = case(var(schaukel),none,schaukel.png,kaputt,schaukelkaputt.png)
+action = 
+inputaction = text("Eine Schaukel.")
+hand =
+messer = wenn(var(schaukel)=None,getitem(Seil,(text("Du hast ein Seil erhalten."),varset(schaukel=kaputt))))
+
+[1, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[2, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[2, 11]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[2, 10]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[2, 9]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[2, 8]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[2, 7]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[2, 6]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[2, 5]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[2, 4]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[2, 3]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[2, 2]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[2, 1]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[2, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[3, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[3, 11]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+Beere = wenn(objekton(3,5),(removeitem(Beere,waschbaer.move(-2,0))))
+
+[3, 10]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[3, 9]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[3, 8]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[3, 7]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[3, 6]
+background = waldboden.png
+file = transparent.png
+action = (.,wenn(var(waldtor)=offen,varset(waldtor=zu)))
+
+[3, 5]
+background = waldboden.png
+file = wenn(var(waldtor)=offen,zauntoroffen.png,zauntor.png)
+action = wenn(var(waldtor)=None,x,(varset(waldtor=offen),.))
+inputaction = wenn(var(waldtor)=None,text("Hat schon wieder jemand den Schlüssel beim Schieberätsel versteckt?"),text("Der Schlüssel steckt wieder."))
+Waldschluessel = (removeitem(Waldschluessel),varset(waldtor=zu),text("Das Schloss ist nun offen."))
+Hand = wenn(var(waldtor)=None,text("Das Tor ist abgeschlossen."),getitem(Waldschluessel,(varset(waldtor=None),text("So, jetzt ist das Tor wieder abgeschlossen.")),text("Ich bräuchte eine freie Hand.")))
+
+[3, 4]
+background = waldboden.png
+file = transparent.png
+action = (.,wenn(var(waldtor)=offen,varset(waldtor=zu)))
+
+[3, 3]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[3, 2]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[3, 1]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[3, 0]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[4, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[4, 11]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[4, 10]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[4, 9]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[4, 8]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[4, 7]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[4, 6]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[4, 5]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[4, 4]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[4, 3]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[4, 2]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[4, 1]
+background = waldbodenloch.png
+file = transparent.png
+action = x 
+hand=wenn(var(schaufelda)=None,(getitem(Schaufel,(varset(schaufelda=false),schaufel.shape(transparent.png),text("Donovan hat gewiss irgendwo einen geheimen Weg. Aber wie finde ich den? Ich habs, er hat doch den Radioaktiven Stoff angefasst. Vielleicht kann ich mit dem Geigerzähler seine Spur verfolgen.")))))
+
+[4, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[5, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[5, 11]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[5, 10]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[5, 9]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[5, 8]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[5, 7]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[5, 6]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[5, 5]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[5, 4]
+background = waldbodengulli.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = open(kanalisation,6,-2)
+
+[5, 3]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[5, 2]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[5, 1]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[5, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[6, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[6, 11]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[6, 10]
+background = bachl.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = x
+
+[6, 9]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[6, 8]
+background = bachl.png
+file = transparent.png
+action = x
+
+[6, 7]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[6, 6]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[6, 5]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[6, 4]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+Geigerzaehler = text(Piep)
+
+[6, 3]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[6, 2]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[6, 1]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[6, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[7, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[7, 11]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[7, 10]
+background = bachur.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = x
+
+[7, 9]
+background = bruecke.png
+file = transparent.png
+action = .
+
+[7, 8]
+background = bachor.png
+file = transparent.png
+action = x
+
+[7, 7]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[7, 6]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[7, 5]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[7, 4]
+background = waldboden.png
+file = transparent.png
+action = .
+Geigerzaehler = text(Piep)
+
+[7, 3]
+background = waldboden.png
+file = transparent.png
+action = .
+Geigerzaehler = text(Piep)
+
+[7, 2]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[7, 1]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[7, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[8, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[8, 11]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[8, 10]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = (.)
+
+[8, 9]
+background = waldboden.png
+file = transparent.png
+action = (.)
+
+[8, 8]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[8, 7]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[8, 6]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[8, 5]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[8, 4]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[8, 3]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+Geigerzaehler = text(Piep)
+
+[8, 2]
+background = waldboden.png
+file = transparent.png
+action = .
+Geigerzaehler = text(Piep)
+
+[8, 1]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[8, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[9, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[9, 11]
+background = waldbodenfestul.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[9, 10]
+background = waldbodenfestl.png
+file = transparent.png
+action = .
+
+[9, 9]
+background = waldbodenfestl.png
+file = transparent.png
+action = .
+
+[9, 8]
+background = waldbodenfestol.png
+file = transparent.png
+action = .
+
+[9, 7]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[9, 6]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[9, 5]
+background = waldboden.png
+file = bank.png
+action = x
+inputaction = text("Eine Bank, ob es hier wohl irgendetwas nützliches gibt?")
+hand=wenn(var(kaugummida)=None,getitem(Kaugummi,(varset(kaugummida=false),text("Ein Kaugummi, was man damit wohl anstellen kann?"))))
+
+[9, 4]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[9, 3]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[9, 2]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+Geigerzaehler = text(Piep)
+
+[9, 1]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[9, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[10, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[10, 11]
+background = waldbodenfestu.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[10, 10]
+background = waldbodenfest.png
+file = transparent.png
+action = .
+
+[10, 9]
+background = waldbodenfest.png
+file = transparent.png
+action = .
+
+[10, 8]
+background = waldbodenfesto.png
+file = transparent.png
+action = .
+
+[10, 7]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[10, 6]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = wenn(var(buschweg)=None,wenn(var(richtung)="links",(text("Von dieser Seite kann ich das Gebüsch beseite schieben."),varset(buschweg=true),gebuesch.move(0,-1)),text("Ich müsste von einer anderen Seite versuchen das Gebüsch zur Seite zu schieben.")),.)
+
+[10, 5]
+background = waldboden.png
+file = transparent.png
+action = wenn(var(buschweg)=None,.,x)
+
+[10, 4]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[10, 3]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = wenn(var(gullida)=None,.,open(kanalisation,1,-4))
+Geigerzaehler = (text(Piep),text("Hier ist irgendetwas im Boden."))
+Schaufel = (varset(gullida=true),gulli.shape(waldbodengulli.png),text("Oh, hier ist ja ein zweiter Eingang in die Kanalisation.")
+
+[10, 2]
+background = waldboden.png
+file = transparent.png
+action = .
+Geigerzaehler = text(Piep)
+
+[10, 1]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[10, 0]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[11, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[11, 11]
+background = waldbodenfestur.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = (.,wenn(var(schluessel)=da,getitem(Waldschluessel,(setvar(schluessel=weg),schluessel.shape(transparent.png)),text("Ich sollte diesen Schlüssel wohl mitnehmen, aber ich habe keine Hand frei."))))
+
+[11, 10]
+background = waldbodenfestr.png
+file = transparent.png
+action = .
+
+[11, 9]
+background = waldbodenfestr.png
+file = transparent.png
+action = .
+
+[11, 8]
+background = waldbodenfestor.png
+file = transparent.png
+action = .
+
+[11, 7]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[11, 6]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[11, 5]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[11, 4]
+background = waldboden.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = .
+
+[11, 3]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[11, 2]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[11, 1]
+background = waldboden.png
+file = transparent.png
+action = .
+
+[11, 0]
+background = waldboden.png
+file = stachelbeerbusch.png
+action = text("Da hängt eine Beere.")
+forperson = beere.png
+Langer_Stock = getitem(Beere)
+
+[12, 12]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = .
+
+[12, 11]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 10]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 9]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 8]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 7]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 6]
+background = grasloch.png
+file = transparent.png
+forperson = nadelbaumoben.png
+action = open(haus,5,5)
+
+[12, 5]
+background = waldboden.png
+file = nadelbaumunten.png
+action = x
+
+[12, 4]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 3]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 2]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 1]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[12, 0]
+background = waldboden.png
+file = nadelbaumobenvorunten.png
+action = x
+
+[objekt kerze]
+action=None
+position=(1,10)
+bild=grablichtan.png
+loopfunction=None
+light=150,125
+
+[objekt schaufel]
+action=None
+position=(4,1)
+bild=schaufel.png
+loopfunction=None
+
+[objekt gulli]
+action=None
+position=(10,3)
+bild=transparent.png
+loopfunction=None
+
+[objekt schluessel]
+action=None
+position=(11,11)
+bild=transparent.png
+loopfunction=None
+
+[objekt stein1]
+action=(push(stein1),wenn(objekton(-3,5),wenn(objekton(-3,2),wenn(objekton(-5,2),wenn(var(schluessel)=None,(varset(schluessel=da),schluessel.shape(schluessel.png)))))))
+position=(10,11)
+bild=stein.png
+loopfunction=None
+
+[objekt stein2]
+action=(push(stein2),wenn(objekton(-3,5),wenn(objekton(-3,2),wenn(objekton(-5,2),wenn(var(schluessel)=None,(varset(schluessel=da),schluessel.shape(schluessel.png)))))))
+position=(10,10)
+bild=stein.png
+loopfunction=None
+
+[objekt stein3]
+action=(push(stein3),wenn(objekton(-3,5),wenn(objekton(-3,2),wenn(objekton(-5,2),wenn(var(schluessel)=None,(varset(schluessel=da),schluessel.shape(schluessel.png)))))))
+position=(10,8)
+bild=stein.png
+loopfunction=None
+
+[objekt waschbaer]
+action=text("Diese Waschbären sind aber auch überall.")
+position=(3,11)
+bild=waschbaer.png
+loopfunction=None
+
+[objekt huette]
+action=None
+position=(1,5)
+bild=erdhuegel.png
+loopfunction=None
+
+[objekt gebuesch]
+action=None
+position=(10,6)
+bild=stachelbeerbusch.png
+loopfunction=None
