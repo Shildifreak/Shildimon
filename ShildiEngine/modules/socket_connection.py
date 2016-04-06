@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import select, socket, time
+import select, socket, time, sys
 
 
 class template():
@@ -15,14 +15,18 @@ class template():
             print "socket error: %s" % why
             return
         else:
-            print self.port
+            pass
+            #print "opened socket at port",self.port
 
     def send(self,msg,addr):
+        if "\n" in msg:
+            sys.stderr.write("message must not contain linebreaks")
+            return
         msg = msg+"\n"
         self.socket.sendto(msg,addr)
 
 class server(template):
-    def __init__(self,port=40000,name="NONAME"):
+    def __init__(self,port=40001,name="NONAME"):
         self.port = port
         self.name = name
         self.msgcache = {} #{addr:msg,...}
@@ -40,7 +44,7 @@ class server(template):
                 except KeyError:
                     self.msgcache[addr]=data
                 if data[-1] in ("\n","\r"):
-                    received.append((self.msgcache[addr],addr))
+                    received.append((self.msgcache[addr][:-1],addr))
                     self.msgcache[addr] = ""
         return received
 
@@ -51,12 +55,15 @@ class server(template):
 
 
 class client(template):
-    def __init__(self,serveraddr,port=40001):
+    def __init__(self,serveraddr,port=40000):
         self.port = port
         self.serveraddr = serveraddr
         self.t_init()
 
     def ask(self,msg,timeout=1):
+        """
+        returns False if server does not respond within timeout
+        """
         self.send(msg,self.serveraddr)
 
         answer=""
@@ -66,16 +73,16 @@ class client(template):
                 if addr == self.serveraddr:
                     answer+=data
                     if data[-1] in ("\n","\r"):
-                        return answer
+                        return answer[:-1]
             else:
                 break
-        return answer
+        return False
 
     def close(self):
         self.socket.sendto("bye",self.serveraddr)
-        s.close()
+        self.socket.close()
 
-def search_servers(waittime=3,port=40000):
+def search_servers(waittime=3,port=40001):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     try:
@@ -93,40 +100,55 @@ def search_servers(waittime=3,port=40000):
             #except socket.error:
             #    name = addr[0]
             #clients.append((name,data[4:]))
-            clients.append((addr,data[4:]))
+            servers.append((addr,data[4:]))
     s.close()
     return servers
 
-
 if __name__ == "__main__":
-    eingabe=None
-    
-    while not eingabe=="quit":
-        eingabe=raw_input(">>> ")
-        if eingabe=="search":
+    while True:
+        eingabe = raw_input(">>> ")
+        if eingabe == "quit":
+            break
+
+        if eingabe == "search":
             servers = search_servers()
             if servers != []:
-                for i,(addr,name) in enumerate(clients):
+                for i,(addr,name) in enumerate(servers):
                     print i, name, addr
-            raw_input("wait")
-            
-        if eingabe=="start":
+            else:
+                print "no servers found"
+
+        if eingabe == "client":
             print "spiel gestartet"
-            for client,name in clients:
-                client = client.split("(")[1].split(")")[0]
-                mysocket.sendto("hallo mama",(client,port))
+            servers = search_servers()
+            if servers != []:
+                addr,name = servers[0]
+                print "connecting to server %s" %name
+                c = client(addr)
+                while True:
+                    eingabe = raw_input("send@server: ")
+                    if eingabe == "close":
+                        break
+                    print c.ask(eingabe)
+                c.close()
+            else:
+                print "no server found"
+        
+        if eingabe == "server":
+            s = server()
             while True:
-                if select.select([mysocket], [], [], 0.2)[0]:
-                    data, addr = mysocket.recvfrom(13)
-                    print data
+                for msg,addr in s.receive():
+                    print "received:",repr(msg)
+                    reply = "reply:"+msg
+                    s.send(reply,addr)
+                    if msg == "shutdown":
+                        break
                 else:
-                    break
-            print "spiel beendet"
-        if eingabe=="shutdown_server":
-            for client,name in clients:
-                client = client.split("(")[1].split(")")[0]
-                mysocket.sendto("quit",(client,port))
-        if eingabe=="help":
+                    continue
+                break
+            s.close()
+
+        if eingabe == "help":
             print """
 show:   shows connections
 search: searchs for computers and connects to them
@@ -135,4 +157,3 @@ start:  starts new game (for test only sends 1 message yet)
 quit:   shutting down client
 shutdown_server: send shutdownsignal to server
 """
-    mysocket.close()
