@@ -8,14 +8,26 @@ force-loading = #M# timer
 python-kroet-modules = #M#
 curserimage = #M#
 
+[test1]
+inherit = test2
+
+[test2]
+inherit = test1
+
+[test3]
+inherit = test4
+
+[test4]
+inherit = test3.blub
+
 [TYPES]
 player@objecttypes = joram
 dialog@objecttypes = testdialog
 
 [joram]
 name = joram
-type = player@objecttypes
-inherit = player@objecttemplates
+type = objecttypes.player
+inherit = objecttemplates.player
 landschaft = Eigenschaften@enginetest2
 display = Eigenschaften@enginetest2,joram_interface
 viewdistance = 10

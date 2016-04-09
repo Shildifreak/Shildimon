@@ -341,15 +341,112 @@ class FileHandler(NestedDict):
                 if i[0] == ["joram","type"]:
                     print "HEY"
                     print self.get_original(i[0])
-                    print i[0]
+                    print i[1]
                 if self.get_original(i[0]) != i[1]:
                     dosave = True
             except KeyError:
                 dosave = True
             if dosave:
                 print i
+        raise NotImplementedError
+
+
+class FileHandler2:
+    FILETYPES = {"cfg":MycfgFile(),
+                 "shl":MycfgFile(),
+                 #"py":PyAstFile(),
+                 #"json":JsonFile(),
+                 #"yaml":YamlFile(),
+                 }
+
+    def __init__(self,gamedir,savefile):
+        """
+        lädt savefile nach data
+        """
+        self.data = {}      # {filename:datastructure,...}
+        # cache.Cache related stuff
+        decide = lambda k,v:True #random.random()<0.1
+        self.originals = cache.Cache(self.readfile,maxn=None,maxt=10,decide=decide) #use only for static files
+        self.gamedir = gamedir
+        self.savefile = savefile
+        if os.path.exists(savefile):
+            self.data = self._readfile(savefile)
+
+    def readfile(self,filename):
+        return self._readfile(os.path.join(self.gamedir,"%s.shl" %filename)) #M#
+
+    def _readfile(self,path):
+        filetype = path.rsplit(".",1)[1]
+        with codecs.open(path,"r",encoding="utf-8") as f:
+            return self.FILETYPES[filetype].read(f)
+
+    def get(self,keys):
+        """
+        -> value, todo
+        bedeutet wenn todo None ist, ist value der erwartete Wert
+                 wenn todo eine Liste ist, ist value der inheritwert
+        Fehler : wenn es kein inherit gab
+        """
+        for top in (self.data,self.originals):
+            for i,key in enumerate(keys):
+                if not isinstance(top,dict):
+                    raise ValueError("can't get attribute from nondict objekt")
+                try:
+                    top = top[key]
+                except KeyError:
+                    if "inherit" in top:
+                        return top["inherit"],keys[i:]
+                    else:
+                        break
+            else:
+                return top,None
+        raise KeyError("%s not found" %keys)
+
+    def set(self,keys):
+        """
+        setzt in globals den entsprechenden Wert
+        setzen von None löscht den Wert?
+        """
+
+    def clear(self):
+        """
+        löscht redundante Informationen aus data
+        """
+
+    def save(self):
+        """
+        speichert data nach savefile
+        """
+
+def encode_inherit(string):
+    if "@" in string:
+        x = string.split("@")
+        x[0] = x[0].split(".")
+        return x
+    return string.split(".")
+
+def getitem(keys, fh2):
+    while True:
+        if not isinstance(keys,list): # allow local vars to be without dot
+            keys = [keys]
+        if not isinstance(keys[0],list):
+            pass
+            # read tmp here
+        else:
+            plainkeys = [keys[1]]+keys[0]
+            value, todo = fh2.get(plainkeys)
+            if not todo:
+                return value
+            keys = encode_inherit(value)
+            keys[0].extend(todo)
+        raw_input(keys)
 
 if __name__ == "__main__":
+    fh = FileHandler2("ShildimonCopy","shildimon.shl")
+    print fh.get(["main","joram","loopaction"])
+    print getitem([["joram","loopaction"],"main"],fh)
+
+if False:#__name__ == "__main__":
     import sys
     sys.argv.append("--debug")
     data = {"size": [1,1],

@@ -1,0 +1,48 @@
+[Eigenschaften]
+type = display@objecttypes
+inherit = landscape@objecttemplates
+name = Enginetest 2
+music = ssm.mid
+initaction = nix
+topleft = 0,0
+size = 3,3
+objects = joram
+
+[0,0]
+type = field@objecttypes
+image = "boden.png"
+
+[0,1]
+type = field@objecttypes
+image = "boden.png"
+
+[0,2]
+type = field@objecttypes
+image = "boden.png,schild.png"
+enter = [text:["test2"],text:["test3"]]
+hitbox = "x"
+
+[1,0]
+type = field@objecttypes
+image = "boden.png"
+
+[1,1]
+type = field@objecttypes
+image = "boden.png,nadelbaumoben.png"
+hitbox = "x"
+
+[1,2]
+type = field@objecttypes
+image = "boden.png"
+
+[2,0]
+type = field@objecttypes
+image = "boden.png";(\#tmp,\boden.png,join(\<line-50-25-25-,add(mul(sin(div(hours(),24)),10),25),\-,add(mul(cos(div(hours(),60)),10),25),\-0-0-255-3>),join(\<line-50-25-25-,add(mul(sin(div(minutes(),60)),15),25),\-,add(mul(cos(div(minutes(),60)),15),25),\-0-255-0-2>),join(\<line-50-25-25-,add(mul(sin(div(seconds(),60)),20),25),\-,add(mul(cos(div(seconds(),60)),20),25),\-255-0-0-1>))
+
+[2,1]
+type = field@objecttypes
+image = "boden.png"
+
+[2,2]
+type = field@objecttypes
+image = "boden.png"

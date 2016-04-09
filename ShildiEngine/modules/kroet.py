@@ -6,6 +6,10 @@ import memanager
 if "--reload" in sys.argv:
     reload(StandartCommands)
     reload(memanager)
+if "--debug" in sys.argv:
+    DEBUG = True
+else:
+    DEBUG = False
 
 TIMEOUT = RuntimeError("Timeout")
 
@@ -29,7 +33,7 @@ class Interpreter():
 
     def open(self,savefilename,gamedir):
         self.save()
-        self.objects = memanager.FileManager(savefilename,gamedir)
+        self.objects = memanager.FileHandler(savefilename,gamedir)
 
     def save(self):
         if hasattr(self.objects,"save"):
@@ -358,7 +362,7 @@ def calculate(operator,args):
         leftarg = calculate(operator,args[:-1])
         rightarg = args[-1]
 
-    if operator in ("+","-","*","/","%","**","<","<=","==",">=",">","!=","<>"):
+    if operator in ("+","-","*","/","//","%","**","<","<=","==",">=",">","!=","<>"):
         if type(rightarg) in (list,tuple):
             if type(leftarg) in (list,tuple): # Array, Array
                 return [calculate(operator,[leftarg[i],rightarg[i]]) for i in xrange(min(len(leftarg),len(rightarg)))]
@@ -375,7 +379,9 @@ def calculate(operator,args):
         elif operator == "*":
             return leftarg * rightarg
         elif operator == "/":
-            return leftarg / rightarg
+            return float(leftarg) / rightarg
+        elif operator == "//":
+            return leftarg // rightarg
         elif operator == "%":
             return leftarg % rightarg
         elif operator == "**":
@@ -394,15 +400,27 @@ def calculate(operator,args):
             return int(leftarg != rightarg)
 
     if operator == ".":
-        if not type(leftarg) in (list,tuple): # Make not list types to list
+        # used to get attribute
+        if isinstance(leftarg,dict):
+            return leftarg.get(rightarg,"")
+        # Make not list types to list
+        if isinstance(leftarg,tuple):
+            leftarg = list(leftarg)
+        elif not isinstance(leftarg,list):
             leftarg = [leftarg]
-        if not type(rightarg) in (list,tuple): # Make not list types to list
+        if isinstance(rightarg,tuple):
+            rightarg = list(rightarg)
+        elif not isinstance(rightarg,list):
             rightarg = [rightarg]
-        if leftarg == [None]: # unary operator
+        # unary operator
+        if leftarg == [None]:
             if rightarg == [None]: # no args at all
                 return []
-            return list(rightarg)
-        return list(leftarg)+list(rightarg) # clear away tuple, return concatenated lists
+            return rightarg
+        return leftarg+rightarg #return concatenated lists
+
+    if operator == "@":
+        return [leftarg,rightarg]
 
     raise NotImplementedError("Operation '%s' is not implemented." %operator)
 
@@ -468,10 +486,11 @@ class Parser():
             '<<', '<', '<=', '==', '>=', '>', '>>',
             '!=', '<>',
             '-', '+',
-            '/', '*', '%',
+            '*', '/', '//', '%',
             '**',
             ':','!',
             '#',
+            '@',
             '.',
             ]
     UNARY_OPERATOR_RANKING = OPERATOR_RANKING.index('#')
@@ -542,7 +561,7 @@ class Parser():
             if pos >= maxpos:
                 break
             char = expression[pos]
-            if char.isalnum() or (char in ('_','@')):
+            if char.isalnum() or (char in ('_')):
                 name += char
                 pos += 1
             else:
@@ -1006,6 +1025,7 @@ if __name__ == "__main__":
             except:
                 raise
                 print "ERROR:",sys.exc_info()[1]
+        print I.objects.data
         raw_input("---continue---")
 
     clearscreen()

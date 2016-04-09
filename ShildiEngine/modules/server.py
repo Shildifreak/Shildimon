@@ -7,7 +7,6 @@ import math
 import hashlib
 
 import kroet
-import filehandler
 if "--reload" in sys.argv:
     reload(kroet)
 
@@ -16,10 +15,10 @@ class Server():
         self.gamedir = gamedir
         self.savefile = savefile
         objdir = os.path.join(self.gamedir,"Objectfiles")
-        defaultfile = os.path.join(self.gamedir,"default.cfg")
+        #defaultfile = os.path.join(self.gamedir,"default.cfg")
         self.interpreter = kroet.Interpreter(varset_func = self.varset_func,
                                              objdir = objdir)
-        self.interpreter.open(savefile,defaultfile)
+        self.interpreter.open(savefile,self.gamedir)
         self.lastupdate = time.time()
         #self.interpreter.AdditionalCommandsets.append(self.landscapecommands)
 

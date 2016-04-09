@@ -1,0 +1,25 @@
+[player]
+attrfunc_landschaft = conattr2list:[]
+publicattrs = name,display,viewdistance,viewdirection,position,dialogs,inventory,image,zoom,imagesize
+publicexecattrs = image
+
+[field]
+publicattrs = image,type
+publicexecattrs = image
+
+[display]
+publicattrs = type,name,music,topleft,size,objects,bgimage,centerpos,zoomable
+publicexecattrs = bgimage,centerpos
+
+[displayed_object]
+publicattrs = image,type,position,imagesize
+publicexecattrs = image
+
+[item]
+publicattrs = image,type,position,imagesize
+publicexecattrs = image
+
+[dialog]
+publicattrs = type,dialogtype,text,options
+
+[eventmap]

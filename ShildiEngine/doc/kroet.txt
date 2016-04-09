@@ -12,11 +12,20 @@ Fußabweisende Schleife
     {until bedingung; ausdruck}
     -> [Rückgabewerte von anweisung]
 
-"Zählschleife"
+"Zählschleife" #M#
     {for varname in Menge; anweisung} -> [Rückgabewerte von anweisung]
+Sequenz von Befehlen #M#
+    {do anweisung1, anweisung2, anweisung3,...}
 
-keine Ahnung was das werden soll, momentan noch ungültig
-    {ausdruck_1; ...; ausdruck_n} (?)
+Allgemein #M#
+    {funktion, ausdruck_1, ausdruck_2, ..., ausdruck_n}
+        tmp = ""
+        while True:
+            tmp,i = funktion(ret,tmp)
+            if i>n: break
+            ret = ausdruck_i
+        return tmp
+
 
 :=  Zuweisung (mit Liste für Attribute, Einzelwert für tmpvar)
 +=  Erhöhen um
@@ -40,18 +49,35 @@ keine Ahnung was das werden soll, momentan noch ungültig
 -   minus
 +   plus
 *   multiplizieren
+//  ganzzahlig dividieren
 /   dividieren
 %   ganzzahliger Rest bei Teilung durch
 **  potenzieren
 
-<-  von rechts in Liste
-->  von links in Liste
-><  Listen verbinden
-
 !   String intepretieren mit Parametern
 :   Funktion aufrufen mit Parametern
+
 .   linkes und rechtes Argument zu liste zusammenfassen (wenn argumente listen, diese auflösen)
 #   Variable lesen (mit Liste für Attribute, Einzelwert für tmpvar)
+@   [variable links, variable rechts]
+
+Spezialwissen zu := # und . #M#
+a:=b
+    b   Wert
+    a   keine Liste -> [a]:=b
+    a   [x,y,z,...]
+        x   string  -> lokale Variable
+        x   @string -> Variable in Datei
+#a
+    a   keine Liste -> [a]
+    a   [x,y,z,...]
+        x   string  -> lokale Variable
+        x   @string -> Variable in Datei
+
+a.b 
+    a   dictionary  -> a[b]
+    a   None        -> [@main,b]
+    a   sonst       -> wie gehabt
 
 Was mach' ich hiermit?
 mul:[2,3]

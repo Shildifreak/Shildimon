@@ -26,9 +26,9 @@ dialog@objecttypes = testdialog
 
 [joram]
 name = joram
-type = objecttypes.player
-inherit = objecttemplates.player
-landschaft = Eigenschaften@enginetest2
+type = player@objecttypes
+inherit = player@objecttemplates
+landschaft = Eigenschaften@enginetest
 display = Eigenschaften@enginetest2,joram_interface
 viewdistance = 10
 viewdirection = 0

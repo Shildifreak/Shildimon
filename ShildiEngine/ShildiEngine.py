@@ -26,10 +26,14 @@ if "--reload" in sys.argv:
     reload(socket_connection)
 
 curdir = os.path.abspath(os.path.curdir)
-gamesdir = os.path.join(curdir,"data","Spiele")
-savedir = os.path.join(curdir,"saves")
-datadir = os.path.join(curdir,"data","commondata")
-settingsfn = os.path.join(curdir,"saves","settings.cfg")
+datadir = os.path.join(os.path.dirname(curdir),"data")
+savedir = os.path.join(os.path.dirname(curdir),"saves")
+
+gamesdir = os.path.join(datadir,"Spiele")
+datadir = os.path.join(datadir,"commondata")
+settingsfn = os.path.join(savedir,"settings.cfg")
+
+print settingsfn
 
 Display = client.Display(datadir,settingsfn)
 
@@ -127,14 +131,15 @@ def create_save_menu(game):
             return 0
 
 def singleplayer(game, save):
-    gamedir = os.path.join(curdir,"data","Spiele",game)
-    savefile = os.path.join(curdir,"saves",game,save)
+    gamedir = os.path.join(gamesdir,game)
+    savefile = os.path.join(savedir,game,save)
 
     Server = server.Server(gamedir,savefile)
     #M# Menü unterschiedlich gestalten jenachdem wie viele Spieler es gibt
     # und ob das erstellen neuer Spieler erlaubt ist
+    print Server.interpreter.objects["TYPES","player@objecttypes"]
     playerlist = ([("Select Player",1,(127,0,255))]+
-                  [(i,) for i in Server.interpreter.get_attribute("TYPES","player@objecttypes").split(",")]+
+                  [(i,) for i in Server.interpreter.objects["TYPES","player@objecttypes"].split(",")]+
                   [("Back",)])
     i_player = Display.menu(playerlist)[0]
     if i_player == -1:
@@ -240,6 +245,6 @@ def ingame_menu():
                ("Back",),]
 
 if __name__ == "__main__":
-    main_menu()
-    #singleplayer("Shildimon","joram.cfg")
+    #main_menu()
+    singleplayer("ShildimonCopy","krottest.cfg")
     Display.close()

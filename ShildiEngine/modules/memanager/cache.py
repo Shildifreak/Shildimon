@@ -6,6 +6,7 @@ class Cache(dict):
     Cache that by default avoids Ping-Pong effect by random filtering of input.
     Might react too slow for some aaabbbccc... like sequences
     special methods for loading and saving data are __pull__ and __push__
+    but saving data may still course bug
     """
     
     def __init__(self,loadfunc,maxn=None,maxt=None,dt=1,decide=lambda k,v:random.random()<0.1,*args,**kwargs):
