@@ -2,40 +2,19 @@
 import cache
 import ast
 import codecs
-import os
+import os, sys
 import copy
 
 # Soll folgendes machen:
 # objects = Filehandler("")
-# key = [[0,0],image]
+# key = ["main","[0,0]","image"]
 # objects[key] -> boden.png
 # objects[key] = gras.png
 # objects.save()
 
-# key soll so viele Argumente haben dürfen wie es lustig ist
-# Ordnerstrukturen sollen als dictionarys aufgefasst werden
 # Verschiedene Formate lesen zulassen
 
 if False:
-    def get_object(self,name):
-        obj = self.objects.get(name,None)
-        if not obj:
-            self.loadobject(name)
-            obj = self.objects.get(name,None)
-        return obj
-
-    def get_attributelist(self,objekt):
-        if not self.objects.has_key(objekt):
-            self.loadobject(objekt)
-        return self.objects[objekt].keys()
-
-
-    #M# List attributes are depreciated, please don't use them :)
-    def split(self,string):
-        if "(" not in string:
-            return string.split(",")
-        raise NotImplementedError("The Split Method of the Interpreter doesn't suppert paranthesis by now. You shouldn't use it anyways.")
-    
     def setlistattr(self,objekt,attribute,value,index):
         attributes = self.split(self.get_attribute(objekt,attribute))[:] #copy is important, so we can use inplace editing
         attributes[index] = value
@@ -58,19 +37,6 @@ if False:
         while value in attributes:
             attributes.remove(value)
         self.set_attribute(objekt,attribute,self.list2str(attributes))
-    # ----------------------------------------------------------
-
-    def create_object(self,name):
-        if not self.objects.has_key(name):
-            self.objects[name] = {}
-        else:
-            print "Error: object name %s already in use" %name
-            return False
-
-    def delete_object(self,name):
-        if self.objects.has_key(name):
-            self.objects[name] = None
-
 
 # ---------- FILETYPE SPECIFIC CLASSES ----------#
 
@@ -252,7 +218,7 @@ class NestedDict:
                 items.append((key,value))
         return items
 
-class FileHandler(NestedDict):
+class FileHandler2(NestedDict):
     FILETYPES = {"cfg":MycfgFile(),
                  "shl":MycfgFile(),
                  #"py":PyAstFile(),
@@ -351,62 +317,52 @@ class FileHandler(NestedDict):
         raise NotImplementedError
 
 
-class FileHandler2:
+class FileHandler:
     FILETYPES = {"cfg":MycfgFile(),
                  "shl":MycfgFile(),
                  #"py":PyAstFile(),
                  #"json":JsonFile(),
-                 #"yaml":YamlFile(),
+                 #"yaml":YamlFile(), #M#
                  }
 
-    def __init__(self,gamedir,savefile):
+    def __init__(self,gamedir=None,savefile=None):
         """
         lädt savefile nach data
         """
-        self.data = {}      # {filename:datastructure,...}
+        self.gamedir = gamedir
+        self.savefile = savefile
         # cache.Cache related stuff
         decide = lambda k,v:True #random.random()<0.1
         self.originals = cache.Cache(self.readfile,maxn=None,maxt=10,decide=decide) #use only for static files
-        self.gamedir = gamedir
-        self.savefile = savefile
-        if os.path.exists(savefile):
+        # the actual data
+        self.data = {}      # {filename:datastructure,...}
+        if savefile and os.path.exists(savefile):
             self.data = self._readfile(savefile)
 
     def readfile(self,filename):
-        return self._readfile(os.path.join(self.gamedir,"%s.shl" %filename)) #M#
+        if self.gamedir:
+            filename = filename.replace("\\","/")
+            basename = os.path.splitext(os.path.basename(filename))[0]
+            filedir = os.path.join(self.gamedir,os.path.dirname(filename))
+            print "listing files of %r" %filedir
+            for f in os.listdir(filedir):
+                if basename == os.path.splitext(f)[0]:
+                    print "opening %r" %f
+                    return self._readfile(os.path.join(filedir,f))
+        if "--debug" in sys.argv:
+            print("file %r at %r not found" %(filename,self.gamedir))
+        return {}
 
     def _readfile(self,path):
         filetype = path.rsplit(".",1)[1]
         with codecs.open(path,"r",encoding="utf-8") as f:
             return self.FILETYPES[filetype].read(f)
 
-    def get(self,keys):
-        """
-        -> value, todo
-        bedeutet wenn todo None ist, ist value der erwartete Wert
-                 wenn todo eine Liste ist, ist value der inheritwert
-        Fehler : wenn es kein inherit gab
-        """
-        for top in (self.data,self.originals):
-            for i,key in enumerate(keys):
-                if not isinstance(top,dict):
-                    raise ValueError("can't get attribute from nondict objekt")
-                try:
-                    top = top[key]
-                except KeyError:
-                    if "inherit" in top:
-                        return top["inherit"],keys[i:]
-                    else:
-                        break
-            else:
-                return top,None
-        raise KeyError("%s not found" %keys)
+    def get(self,keys,default=None):
+        return deepget((self.data,self.originals),keys,default)
 
-    def set(self,keys):
-        """
-        setzt in globals den entsprechenden Wert
-        setzen von None löscht den Wert?
-        """
+    def set(self,keys,value):
+        deepset(self.data,keys,value)
 
     def clear(self):
         """
@@ -418,6 +374,52 @@ class FileHandler2:
         speichert data nach savefile
         """
 
+MISSING = object()
+def deepget(data,keys,default=MISSING):
+    """
+    data: sequence of dicts
+    keys: sequence of keys
+    -> value, todo
+    bedeutet wenn todo None ist, ist value der erwartete Wert
+             wenn todo eine Liste ist, ist value der inheritwert
+             wenn todo False ist, wurde der default Wert genommen
+    """
+    for top in data:
+        for i,key in enumerate(keys):
+            if not isinstance(top,dict):
+                raise ValueError("can't get attribute from nondict objekt %s" %top)
+            try:
+                top = top[key]
+            except KeyError:
+                if "inherit" in top:
+                    return top["inherit"],keys[i:]
+                else:
+                    break
+        else:
+            return top,None
+    if default == MISSING:
+        raise KeyError(keys)
+    return default,False
+
+def deepset(container,keys,value):
+    """
+    setzt in container den entsprechenden Wert
+    setzen von None löscht den Wert? #M#
+    """
+    if not isinstance(keys,(list,tuple)):
+        raise ValueError()
+    for key in keys[:-1]:
+        try:
+            new_container = container[key]
+        except KeyError:
+            new_container = None
+        if not isinstance(new_container,dict):
+            # create new subdict possibly overwriting nondict attribute!
+            new_container = {}
+            container[key] = new_container
+        container = new_container
+    container[keys[-1]] = value
+
 def encode_inherit(string):
     if "@" in string:
         x = string.split("@")
@@ -425,7 +427,7 @@ def encode_inherit(string):
         return x
     return string.split(".")
 
-def getitem(keys, fh2):
+def getitem(keys, fh2, default="default"):
     while True:
         if not isinstance(keys,list): # allow local vars to be without dot
             keys = [keys]
@@ -434,7 +436,10 @@ def getitem(keys, fh2):
             # read tmp here
         else:
             plainkeys = [keys[1]]+keys[0]
-            value, todo = fh2.get(plainkeys)
+            try:
+                value, todo = fh2.get(plainkeys)
+            except KeyError:
+                return default
             if not todo:
                 return value
             keys = encode_inherit(value)
@@ -442,9 +447,9 @@ def getitem(keys, fh2):
         raw_input(keys)
 
 if __name__ == "__main__":
-    fh = FileHandler2("ShildimonCopy","shildimon.shl")
-    print fh.get(["main","joram","loopaction"])
+    fh = FileHandler("ShildimonCopy","shildimon.shl")
     print getitem([["joram","loopaction"],"main"],fh)
+    print fh.get(["main","joram","loopaction"])
 
 if False:#__name__ == "__main__":
     import sys

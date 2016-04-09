@@ -14,30 +14,49 @@ else:
 TIMEOUT = RuntimeError("Timeout")
 
 class Interpreter():
-    def __init__(self,varset_func = None,objdir = None): #M# ehemals objdir=None
+    def __init__(self,varset_func = None,filehandler = None): #M# ehemals objdir=None
         self.parser = Parser()
-        self.objects = memanager.NestedDict()
-        self.objdir = objdir
-        #self.objecttypes = {} # is this used anywhere?
+        if not filehandler:
+            filehandler = memanager.FileHandler()
+        self.filehandler = filehandler
+        #self.objects = memanager.NestedDict()
+        #self.objdir = objdir
         self.interrupted_funcs = []
-        #self.configparser = ConfigParser.ConfigParser()
-        #self.staticobjparser = ConfigParser.ConfigParser()
-        #self.staticobjfile = None
-        #self.filename = None
-        #self.envvar = []
         #self.varset_func = varset_func
-        #self.objdir = None #M#
-        #if self.objdir == None:
-        #    self.objdir = "."+os.sep
         self.AdditionalCommandsets = []
 
     def open(self,savefilename,gamedir):
         self.save()
-        self.objects = memanager.FileHandler(savefilename,gamedir)
+        self.filehandler = memanager.FileHandler(gamedir, savefilename)
+        #self.objects = memanager.FileHandler(savefilename,gamedir)
 
     def save(self):
-        if hasattr(self.objects,"save"):
+        if self.filehandler:
             self.objects.save()
+
+    def get_var(self, keys, currentLayer, default = "default"):
+        while True:
+            if not isinstance(keys,(list,tuple)): # allow local vars to be without dot
+                keys = [keys]
+            if not isinstance(keys[0],(list,tuple)):
+                value, todo = memanager.deepget((currentLayer.tmpvar,),keys,default)
+            else:
+                plainkeys = [keys[1]]+keys[0]
+                value, todo = self.filehandler.get(plainkeys,default)
+            if not todo:
+                return value
+            keys = encode_inherit(value)
+            keys[0].extend(todo)
+            raw_input(keys)
+    
+    def set_var(self, keys, value, currentLayer):
+        if not isinstance(keys,(list,tuple)): # allow local vars to be without dot
+            keys = [keys]
+        if isinstance(keys[0],(list,tuple)):
+            plainkeys = [keys[1]]+keys[0]
+            self.filehandler.set(plainkeys,value)
+        else:
+            memanager.deepset(currentLayer.tmpvar,keys,value)
 
     def loadobject(self,objectname):
         raise NotImplementedError
@@ -260,16 +279,9 @@ class Interpreter():
                         rightarg = args[1]
                     
                     if operator == "#":
-                        arg = args[0]
-                        if type(arg) in (list,tuple):
-                            result = self.objects.get(arg,"default")
-                        else:
-                            result = cL.tmpvar.get(arg,"")
+                        result = self.get_var(args[0],cL)
                     elif operator == ":=":
-                        if type(leftarg) in (list,tuple):
-                            self.objects[leftarg] = rightarg
-                        else:
-                            cL.tmpvar[leftarg] = rightarg
+                        self.set_var(leftarg,rightarg,cL)
                         result = rightarg
                     elif operator == "!":
                         if (type(leftarg) in (str,unicode)) and (type(rightarg) in (list,tuple)):
@@ -420,6 +432,8 @@ def calculate(operator,args):
         return leftarg+rightarg #return concatenated lists
 
     if operator == "@":
+        if not isinstance(leftarg,(list,tuple)):
+            leftarg = [leftarg]
         return [leftarg,rightarg]
 
     raise NotImplementedError("Operation '%s' is not implemented." %operator)
@@ -1014,18 +1028,21 @@ if __name__ == "__main__":
         if crode == "q":
             break
         elif crode == "":
-            print I.objects
+            print I.filehandler.data
             print I.interrupted_funcs
-            I.continue_execute()
+            try:
+                I.continue_execute()
+            except:
+                print "ERROR:",sys.exc_info()[1]
         else:
             crode_history.append(crode)
             try:
                 print
                 print "RESULT: "+repr(I.execute(crode,tmax=1,printstepinfo=False,stepbystep=True))
             except:
-                raise
+                #raise
                 print "ERROR:",sys.exc_info()[1]
-        print I.objects.data
+        print I.filehandler.data
         raw_input("---continue---")
 
     clearscreen()
