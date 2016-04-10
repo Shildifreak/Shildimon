@@ -13,6 +13,13 @@ else:
 
 TIMEOUT = RuntimeError("Timeout")
 
+def encode_inherit(string): #M# dont use this but rather execute the line
+    if "@" in string:
+        x = string.split("@")
+        x[0] = x[0].split(".")
+        return x
+    return string.split(".")
+
 class Interpreter():
     def __init__(self,varset_func = None,filehandler = None): #M# ehemals objdir=None
         self.parser = Parser()
@@ -23,6 +30,7 @@ class Interpreter():
         #self.objdir = objdir
         self.interrupted_funcs = []
         #self.varset_func = varset_func
+        print "varset_func is currently ignored!"
         self.AdditionalCommandsets = []
 
     def open(self,savefilename,gamedir):
@@ -32,149 +40,153 @@ class Interpreter():
 
     def save(self):
         if self.filehandler:
-            self.objects.save()
+            self.filehandler.save()
 
-    def get_var(self, keys, currentLayer, default = "default"):
+    def get_var(self, plainkeys, default="default", envvar={}):
+        if envvar: #M# delete this one day?
+            raise Exception("Unexpexted error!")
         while True:
-            if not isinstance(keys,(list,tuple)): # allow local vars to be without dot
-                keys = [keys]
-            if not isinstance(keys[0],(list,tuple)):
-                value, todo = memanager.deepget((currentLayer.tmpvar,),keys,default)
-            else:
-                plainkeys = [keys[1]]+keys[0]
-                value, todo = self.filehandler.get(plainkeys,default)
+            value, todo = self.filehandler.get(plainkeys,default)
             if not todo:
                 return value
-            keys = encode_inherit(value)
-            keys[0].extend(todo)
-            raw_input(keys)
-    
-    def set_var(self, keys, value, currentLayer):
-        if not isinstance(keys,(list,tuple)): # allow local vars to be without dot
-            keys = [keys]
-        if isinstance(keys[0],(list,tuple)):
-            plainkeys = [keys[1]]+keys[0]
-            self.filehandler.set(plainkeys,value)
+            keys = encode_inherit(value) #M# to be replaced by execute
+            if not (isinstance(keys,(list,tuple)) and isinstance(keys[0],(list,tuple))):
+                raise ValueError("inherit must be global variable not %r" %value)
+            plainkeys = [keys[1]]+keys[0]+todo
+
+    # only for compatibility with server... may be removed if someone changes the server script to use get_var
+    def get_attribute(self,objekt,attribute,default="",usetypeaction=True):
+        if "@" in objekt:
+            objekt,filename = objekt.split("@")
         else:
-            memanager.deepset(currentLayer.tmpvar,keys,value)
+            filename = "main"
+        return self.get_var([filename,objekt,attribute],default)
 
-    def loadobject(self,objectname):
-        raise NotImplementedError
-        if self.objects.has_key(objectname):
-            return None
-        if self.configparser.has_section(objectname):
-            self.objects[objectname] = dict(self.configparser.items(objectname))
-            return True
-        if "@" in objectname:
-            if self.staticobjfile != objectname.split("@")[1]:
-                fn=os.path.join(self.objdir,objectname.split("@")[1]+".shl")
-                self.staticobjparser = ConfigParser.ConfigParser()
-                self.staticobjparser.read(fn)
-                self.staticobjfile = objectname.split("@")[1]
-            if self.staticobjparser.has_section(objectname.split("@")[0]):
-                self.objects[objectname] = dict(self.staticobjparser.items(objectname.split("@")[0]))
+    def set_attribute(self,objekt,attribute,value):
+        if "@" in objekt:
+            objekt,filename = objekt.split("@")
+        else:
+            filename = "main"
+        print "writing",[filename,objekt,attribute],value
+        self.filehandler.set([filename,objekt,attribute],value)
+        print "written"
+
+    if False:
+
+        def loadobject(self,objectname):
+            raise NotImplementedError
+            if self.objects.has_key(objectname):
+                return None
+            if self.configparser.has_section(objectname):
+                self.objects[objectname] = dict(self.configparser.items(objectname))
                 return True
-        self.objects[objectname] = None
-        return False
-
-    def saveNclear(self):
-        raise NotImplementedError
-        print("saving data")
-        #clear empty attributes
-        for objectname,data in self.objects.items():
-            if data != None:
-                for var,val in data.items():
-                    if val == "":
-                        if self.configparser.has_section(objectname):
-                            self.configparser.remove_option(objectname,var)
-                        self.objects[objectname].pop(var)
-            else:
-                self.objects.pop(objectname)
-                if self.configparser.has_section(objectname):
-                    self.configparser.remove_section(objectname)
-        for objectname,data in self.objects.items():
-            # update staticobjparser for later request
             if "@" in objectname:
                 if self.staticobjfile != objectname.split("@")[1]:
                     fn=os.path.join(self.objdir,objectname.split("@")[1]+".shl")
                     self.staticobjparser = ConfigParser.ConfigParser()
                     self.staticobjparser.read(fn)
                     self.staticobjfile = objectname.split("@")[1]
-            # see if @-object is the same like in file
-            if ("@" in objectname and \
-                self.staticobjparser.has_section(objectname.split("@")[0]) and \
-                data == dict(self.staticobjparser.items(objectname.split("@")[0]))):
-                # if so, delete
-                if self.configparser.has_section(objectname):
-                    self.configparser.remove_section(objectname)
-            # all other objects are refreshed
-            else:
-                if not self.configparser.has_section(objectname):
-                    self.configparser.add_section(objectname)
-                for var,val in data.items():
-                    self.configparser.set(objectname,var,val)
-        # and saved to file
-        configdatei=open(self.filename, 'wb')
-        self.configparser.write(configdatei)
-        configdatei.close()
-        print("clearing cache")
-        self.objects.clear()
-        #for d in self.splitcache.values(): #M# no splitcache by now
-        #    d.clear()
+                if self.staticobjparser.has_section(objectname.split("@")[0]):
+                    self.objects[objectname] = dict(self.staticobjparser.items(objectname.split("@")[0]))
+                    return True
+            self.objects[objectname] = None
+            return False
 
-    def get_object(self,name):
-        raise NotImplementedError
-        obj = self.objects.get(name,None)
-        if not obj:
-            self.loadobject(name)
+        def saveNclear(self):
+            raise NotImplementedError
+            print("saving data")
+            #clear empty attributes
+            for objectname,data in self.objects.items():
+                if data != None:
+                    for var,val in data.items():
+                        if val == "":
+                            if self.configparser.has_section(objectname):
+                                self.configparser.remove_option(objectname,var)
+                            self.objects[objectname].pop(var)
+                else:
+                    self.objects.pop(objectname)
+                    if self.configparser.has_section(objectname):
+                        self.configparser.remove_section(objectname)
+            for objectname,data in self.objects.items():
+                # update staticobjparser for later request
+                if "@" in objectname:
+                    if self.staticobjfile != objectname.split("@")[1]:
+                        fn=os.path.join(self.objdir,objectname.split("@")[1]+".shl")
+                        self.staticobjparser = ConfigParser.ConfigParser()
+                        self.staticobjparser.read(fn)
+                        self.staticobjfile = objectname.split("@")[1]
+                # see if @-object is the same like in file
+                if ("@" in objectname and \
+                    self.staticobjparser.has_section(objectname.split("@")[0]) and \
+                    data == dict(self.staticobjparser.items(objectname.split("@")[0]))):
+                    # if so, delete
+                    if self.configparser.has_section(objectname):
+                        self.configparser.remove_section(objectname)
+                # all other objects are refreshed
+                else:
+                    if not self.configparser.has_section(objectname):
+                        self.configparser.add_section(objectname)
+                    for var,val in data.items():
+                        self.configparser.set(objectname,var,val)
+            # and saved to file
+            configdatei=open(self.filename, 'wb')
+            self.configparser.write(configdatei)
+            configdatei.close()
+            print("clearing cache")
+            self.objects.clear()
+            #for d in self.splitcache.values(): #M# no splitcache by now
+            #    d.clear()
+
+        def get_object(self,name):
+            raise NotImplementedError
             obj = self.objects.get(name,None)
-        return obj
+            if not obj:
+                self.loadobject(name)
+                obj = self.objects.get(name,None)
+            return obj
 
-    def get_attributelist(self,objekt):
-        raise NotImplementedError
-        if not self.objects.has_key(objekt):
-            self.loadobject(objekt)
-        return self.objects[objekt].keys()
+        def get_attributelist(self,objekt):
+            raise NotImplementedError
+            if not self.objects.has_key(objekt):
+                self.loadobject(objekt)
+            return self.objects[objekt].keys()
 
-    def get_attribute(self,objekt,attribute,default="",usetypeaction=True):
-        raise NotImplementedError
-        if not self.objects.has_key(objekt):
-            self.loadobject(objekt)
-        if self.objects[objekt] == None:
-            return default
-        ret = self.objects[objekt].get(attribute,"")
-        if ret in [""]:
-            if self.objects[objekt].has_key("inherit"):
-                return self.get_attribute(self.objects[objekt]["inherit"],attribute)
-            return default
-        return ret
+        def get_attribute(self,objekt,attribute,default="",usetypeaction=True):
+            raise NotImplementedError
+            if not self.objects.has_key(objekt):
+                self.loadobject(objekt)
+            if self.objects[objekt] == None:
+                return default
+            ret = self.objects[objekt].get(attribute,"")
+            if ret in [""]:
+                if self.objects[objekt].has_key("inherit"):
+                    return self.get_attribute(self.objects[objekt]["inherit"],attribute)
+                return default
+            return ret
 
-    def set_attribute(self,objekt,attribute,value):
-        raise NotImplementedError
-        if not self.objects.has_key(objekt):
-            self.loadobject(objekt)
-        if self.objects[objekt] == None:
-            self.objects[objekt] = {} #M# only here for testing - replace with error message later
-        if self.varset_func != None:
-            valueold = self.get_attribute(objekt,attribute)
-            self.varset_func(objekt,attribute,valueold,value)
-        self.objects[objekt][attribute] = value
+        def set_attribute(self,objekt,attribute,value):
+            raise NotImplementedError
+            if not self.objects.has_key(objekt):
+                self.loadobject(objekt)
+            if self.objects[objekt] == None:
+                self.objects[objekt] = {} #M# only here for testing - replace with error message later
+            if self.varset_func != None:
+                valueold = self.get_attribute(objekt,attribute)
+                self.varset_func(objekt,attribute,valueold,value)
+            self.objects[objekt][attribute] = value
 
-    #M# List attributes are depreciated, please don't use them :)
+    #M# List attributes are depreciated, please don't use them :) --> have to be removed from dialog functions
     def split(self,string):
-        raise NotImplementedError
         if "(" not in string:
             return string.split(",")
         raise NotImplementedError("The Split Method of the Interpreter doesn't suppert paranthesis by now. You shouldn't use it anyways.")
-    
+        
     def setlistattr(self,objekt,attribute,value,index):
-        raise NotImplementedError
         attributes = self.split(self.get_attribute(objekt,attribute))[:] #copy is important, so we can use inplace editing
         attributes[index] = value
         self.set_attribute(objekt,attribute,self.list2str(attributes))
 
     def add2listattr(self,objekt,attribute,value,index=None):
-        raise NotImplementedError
         if index == None:
             liststr = self.get_attribute(objekt,attribute)
             if liststr != "":
@@ -187,7 +199,6 @@ class Interpreter():
             self.set_attribute(objekt,attribute,self.list2str(attributes))
 
     def delfromlistattr(self,objekt,attribute,value):
-        raise NotImplementedError
         attributes = self.split(self.get_attribute(objekt,attribute,""))[:] #copy, so we can use remove command (inplace)
         while value in attributes:
             attributes.remove(value)
@@ -195,20 +206,12 @@ class Interpreter():
     # ----------------------------------------------------------
 
     def create_object(self,name):
-        raise NotImplementedError
-        if not self.objects.has_key(name):
-            self.objects[name] = {}
-        else:
-            print "Error: object name %s already in use" %name
-            return False
+        self.filehandler.set(["main",name],{})
 
     def delete_object(self,name):
-        raise NotImplementedError
-        if self.objects.has_key(name):
-            self.objects[name] = None
+        self.filehandler.set(["main",name],None)
 
     def list2str(self,l):
-        raise NotImplementedError
         r = "".join([str(i)+"," for i in l])
         if r.endswith(","):
             r = r[:-1]
@@ -235,7 +238,7 @@ class Interpreter():
             return task.result
         else:
             self.interrupted_funcs.append(task.to_literal())
-            return "" #no result yet
+            return "no result yet" #no result yet
 
     def _execute(self, task, printstepinfo=False, stepbystep=False):
         # write, operator, operation, pack, case, jump, if0jump
@@ -279,9 +282,31 @@ class Interpreter():
                         rightarg = args[1]
                     
                     if operator == "#":
-                        result = self.get_var(args[0],cL)
+                        todo = []
+                        keys = args[0]
+                        default = ""
+                        if len(args) > 1:
+                            default = args[1]
+                        while True:
+                            if not isinstance(keys,(list,tuple)): #allow local vars to be without dot
+                                keys = [keys]
+                            if not isinstance(keys[0],(list,tuple)): #local var
+                                result, todo = memanager.deepget((cL.tmpvar,),keys+todo,default)
+                                if todo:
+                                    keys = encode_inherit(result) #M# to be replaced by execute
+                                    continue
+                            else:
+                                plainkeys = [keys[1]]+keys[0]+todo
+                                result = self.get_var(plainkeys,default=default,envvar=cL.envvar)
+                            break
+
                     elif operator == ":=":
-                        self.set_var(leftarg,rightarg,cL)
+                        if not isinstance(leftarg,(list,tuple)): # allow local vars to be without dot
+                            leftarg = [leftarg]
+                        if isinstance(leftarg[0],(list,tuple)):
+                            self.filehandler.set([leftarg[1]]+leftarg[0],rightarg)
+                        else:
+                            memanager.deepset(cL.tmpvar,leftarg,rightarg)
                         result = rightarg
                     elif operator == "!":
                         if (type(leftarg) in (str,unicode)) and (type(rightarg) in (list,tuple)):
@@ -362,7 +387,6 @@ class Interpreter():
         return function((self,envvar),*args)
 
 def calculate(operator,args):
-    print args
     n = len(args)
     if n == 0:
         leftarg = rightarg = None
@@ -928,8 +952,15 @@ if __name__ == "__main__":
 
     I = Interpreter()
 
-    command = "1:[a:=5,{while #a;a:=#a-1}]"
-    print "result: "+repr(I.execute(command,printstepinfo=True,stepbystep=False))
+    command1 = "1:[a:=5,{while #a;a:=#a-1}]"
+    for command in (command1,):
+        print "command:", command
+        print "result: "+repr(I.execute(command,printstepinfo=False,stepbystep=False))
+        import time
+        for i in range(5):
+            t = time.time()
+            I.execute(command,printstepinfo=False,stepbystep=False)
+            print "dt:",time.time()-t
     raw_input("---continue---")
 
     #command = "{while1;print:(int:[time:[]*10000]%10)}"

@@ -137,9 +137,9 @@ def singleplayer(game, save):
     Server = server.Server(gamedir,savefile)
     #M# Menü unterschiedlich gestalten jenachdem wie viele Spieler es gibt
     # und ob das erstellen neuer Spieler erlaubt ist
-    print Server.interpreter.objects["TYPES","player@objecttypes"]
+    print Server.interpreter.get_var(["main","TYPES","player@objecttypes"])
     playerlist = ([("Select Player",1,(127,0,255))]+
-                  [(i,) for i in Server.interpreter.objects["TYPES","player@objecttypes"].split(",")]+
+                  [(i,) for i in Server.interpreter.get_var(["main","TYPES","player@objecttypes"]).split(",")]+
                   [("Back",)])
     i_player = Display.menu(playerlist)[0]
     if i_player == -1:

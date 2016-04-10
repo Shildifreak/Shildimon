@@ -50,7 +50,7 @@ class MycfgFile:
         current_indent = 0
         current_dict = data
         for rawline in lines:
-            rawline = rawline[:-1]
+            rawline = rawline.rstrip("\n\r")
             line = rawline.lstrip()
             # skip empty lines
             if len(line) == 0:
@@ -354,6 +354,7 @@ class FileHandler:
         return {}
 
     def _readfile(self,path):
+        print path
         filetype = path.rsplit(".",1)[1]
         with codecs.open(path,"r",encoding="utf-8") as f:
             return self.FILETYPES[filetype].read(f)
@@ -373,6 +374,7 @@ class FileHandler:
         """
         speichert data nach savefile
         """
+        print "save is not implemented yet!"
 
 MISSING = object()
 def deepget(data,keys,default=MISSING):
@@ -414,11 +416,14 @@ def deepset(container,keys,value):
         except KeyError:
             new_container = None
         if not isinstance(new_container,dict):
-            # create new subdict possibly overwriting nondict attribute!
+            #M# create new subdict possibly overwriting nondict attribute! rethink whether this should be allowed or has to be done explicitely by calling create_object
             new_container = {}
             container[key] = new_container
         container = new_container
-    container[keys[-1]] = value
+    if value == None:
+        del container[keys[-1]]
+    else:
+        container[keys[-1]] = value
 
 def encode_inherit(string):
     if "@" in string:

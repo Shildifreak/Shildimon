@@ -16,14 +16,14 @@ class Server():
         self.savefile = savefile
         objdir = os.path.join(self.gamedir,"Objectfiles")
         #defaultfile = os.path.join(self.gamedir,"default.cfg")
-        self.interpreter = kroet.Interpreter(varset_func = self.varset_func,
-                                             objdir = objdir)
+        self.interpreter = kroet.Interpreter(varset_func = self.varset_func,)
+                                             #objdir = objdir)
         self.interpreter.open(savefile,self.gamedir)
         self.lastupdate = time.time()
         #self.interpreter.AdditionalCommandsets.append(self.landscapecommands)
 
     def close(self):
-        self.interpreter.saveNclear()
+        self.interpreter.save()
 
     def update(self):
         dt = time.time()-self.lastupdate
@@ -43,8 +43,12 @@ class Server():
         #            self.interpreter.set_attribute(objekt,"events",self.interpreter.list2str(events))
         #            self.interpreter.execute(event,{"object":objekt,"dt":dt})
         #Loopaction
-        for objekt in self.interpreter.objects.keys():
+        #for objekt in self.interpreter.objects.keys():
+        for objekt in self.interpreter.filehandler.data.get("main",()): #M# only loaded objects
             if objekt != "":
+                # Test whether variable is indeed object
+                if not isinstance(self.interpreter.filehandler.data.get("main",{}).get(objekt,None),dict):
+                    continue
                 action = self.interpreter.get_attribute(objekt,"loopaction","")
                 if action != "":
                     self.interpreter.execute(action,{"object":objekt,"dt":dt})

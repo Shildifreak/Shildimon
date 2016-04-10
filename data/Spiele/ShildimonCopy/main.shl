@@ -26,8 +26,8 @@ dialog@objecttypes = testdialog
 
 [joram]
 name = joram
-type = objecttypes.player
-inherit = objecttemplates.player
+type = player@objecttypes
+inherit = player@objecttemplates
 landschaft = Eigenschaften@enginetest2
 display = Eigenschaften@enginetest2,joram_interface
 viewdistance = 10
@@ -65,11 +65,11 @@ imagesize = 129px,129px
 
 [joram_lefthand]
 position = -0.5w+10px,-0.5h+119px,0
-inherit = example_item
+inherit = example_item@main
 
 [joram_righthand]
 position = 0.5w+-119px,-0.5h+119px,0
-inherit = example_item
+inherit = example_item@main
 
 [example_item]
 name = examplename
