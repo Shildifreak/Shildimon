@@ -1,4 +1,7 @@
-﻿import sys,os
+#!/usr/bin/python
+#* encoding:utf-8
+
+import sys,os
 import time
 import ConfigParser
 import StandartCommands
@@ -53,6 +56,27 @@ class Interpreter():
             if not (isinstance(keys,(list,tuple)) and isinstance(keys[0],(list,tuple))):
                 raise ValueError("inherit must be global variable not %r" %value)
             plainkeys = [keys[1]]+keys[0]+todo
+
+    def _get_var(self,args,cL):
+        #M# muss noch optimiert werden :( warum muss es überhaupt eine Funktion sein?
+        todo = []
+        keys = args[0]
+        default = ""
+        if len(args) > 1:
+            default = args[1]
+        while True:
+            if not isinstance(keys,(list,tuple)): #allow local vars to be without dot
+                keys = [keys]
+            if not isinstance(keys[0],(list,tuple)): #local var
+                result, todo = memanager.deepget((cL.tmpvar,),keys+todo,default)
+                if todo:
+                    keys = encode_inherit(result) #M# to be replaced by execute
+                    continue
+            else:
+                plainkeys = [keys[1]]+keys[0]+todo
+                result = self.get_var(plainkeys,default=default,envvar=cL.envvar)
+            break
+        return result
 
     # only for compatibility with server... may be removed if someone changes the server script to use get_var
     def get_attribute(self,objekt,attribute,default="",usetypeaction=True):
@@ -282,23 +306,7 @@ class Interpreter():
                         rightarg = args[1]
                     
                     if operator == "#":
-                        todo = []
-                        keys = args[0]
-                        default = ""
-                        if len(args) > 1:
-                            default = args[1]
-                        while True:
-                            if not isinstance(keys,(list,tuple)): #allow local vars to be without dot
-                                keys = [keys]
-                            if not isinstance(keys[0],(list,tuple)): #local var
-                                result, todo = memanager.deepget((cL.tmpvar,),keys+todo,default)
-                                if todo:
-                                    keys = encode_inherit(result) #M# to be replaced by execute
-                                    continue
-                            else:
-                                plainkeys = [keys[1]]+keys[0]+todo
-                                result = self.get_var(plainkeys,default=default,envvar=cL.envvar)
-                            break
+                        result = self._get_var(args,cL)
 
                     elif operator == ":=":
                         if not isinstance(leftarg,(list,tuple)): # allow local vars to be without dot
@@ -309,7 +317,7 @@ class Interpreter():
                             memanager.deepset(cL.tmpvar,leftarg,rightarg)
                         result = rightarg
                     elif operator == "!":
-                        if (type(leftarg) in (str,unicode)) and (type(rightarg) in (list,tuple)):
+                        if isinstance(leftarg,basestring) and isinstance(rightarg,(list,tuple)):
                             cL.i += 1
                             task.add_layer(self.parser.cached_parse(leftarg),dict(enumerate(rightarg)))
                             break
@@ -320,8 +328,20 @@ class Interpreter():
                     else:
                         try:
                             result = calculate(operator,args) # all the other operations that don't mess with memory
-                        except NotImplementedError:
-                            result = self.call_function(operator,args,cL)
+                        except NotImplementedError: # functions implemented in additional python module
+                            try:
+                                result = self.call_function(operator,args,cL)
+                            except NotImplementedError: # functions implemented in kroet variables
+                                print "Funktion %s not found" %operator
+                                operator = self._get_var([operator],cL)
+                                print "operator %s" %operator
+                                print "args %s" %args
+                                if isinstance(operator,basestring):
+                                    cL.i += 1
+                                    task.add_layer(self.parser.cached_parse(operator),dict(enumerate(args)))
+                                    break
+                                else:
+                                    raise TypeError("wrong type of argument(s) for operation %s" %operator)
                     cL.stack.append(result)
                     cL.i += 1
                 elif action == "wait":
@@ -374,16 +394,17 @@ class Interpreter():
 
     def call_function(self,func,args,currentLayer):
         envvar = currentLayer.envvar
-
-        function = StandartCommands.commands.get(func,None)
+        try:
+            function = StandartCommands.commands.get(func,None)
+        except TypeError: #unhashable type (eg. list)
+            raise NotImplementedError
         if function == None:
             for commandset in self.AdditionalCommandsets:
                 function = commandset.get(func,None)
                 if function != None:
                     break
         if function == None:
-            print "function", func, "not found"
-            function = StandartCommands.dummi
+            raise NotImplementedError
         return function((self,envvar),*args)
 
 def calculate(operator,args):
@@ -919,163 +940,173 @@ class Parser():
 
 
 if __name__ == "__main__":
-    from consoleIO import colorama
-    colorama.init()
-    Fore = colorama.Fore
-    Back = colorama.Back
-    Style = colorama.Style
+    if len(sys.argv)>1:
+        print sys.argv
+        I = Interpreter()
+        with open(sys.argv[1],"r") as f:
+            #M# nicht einfach so die erste Zeile ignorieren, sondern nur wenn es ein Shebang ist
+            command = "[%s]" %", ".join(map(lambda s: s.strip("\n\r"),f.readlines()[1:]))
+        print "executing: %s" %command
+        I.execute(command)
+    else:
+        # Interaktiver Modus
+        from consoleIO import colorama
+        colorama.init()
+        Fore = colorama.Fore
+        Back = colorama.Back
+        Style = colorama.Style
 
-    from consoleIO import Getch
-    getch = Getch()
-    raw_input = getch.raw_input
-    
-    import sys
-    
-    def goto(x,y):
-        return '\x1b[%d;%dH' % (y, x)
+        from consoleIO import Getch
+        getch = Getch()
+        raw_input = getch.raw_input
+        
+        import sys
+        
+        def goto(x,y):
+            return '\x1b[%d;%dH' % (y, x)
 
-    def nprint(text): # unlike the normal print this won't insert any newline or space after text
-        sys.stdout.write(text)
-        sys.stdout.flush()
+        def nprint(text): # unlike the normal print this won't insert any newline or space after text
+            sys.stdout.write(text)
+            sys.stdout.flush()
 
-    MINX = 1
-    MINY = 1
-    dt = 0.01
+        MINX = 1
+        MINY = 1
+        dt = 0.01
 
-    def clearscreen():
-        # set color to white-on-black with normal brightness.
-        nprint('%s' %Style.RESET_ALL)
-        # clear screen
-        nprint('\x1b[2J')
-        # put cursor to top, left
-        nprint(goto(MINX, MINY))
+        def clearscreen():
+            # set color to white-on-black with normal brightness.
+            nprint('%s' %Style.RESET_ALL)
+            # clear screen
+            nprint('\x1b[2J')
+            # put cursor to top, left
+            nprint(goto(MINX, MINY))
 
-    I = Interpreter()
+        I = Interpreter()
 
-    command1 = "1:[a:=5,{while #a;a:=#a-1}]"
-    for command in (command1,):
-        print "command:", command
-        print "result: "+repr(I.execute(command,printstepinfo=False,stepbystep=False))
-        import time
-        for i in range(5):
-            t = time.time()
-            I.execute(command,printstepinfo=False,stepbystep=False)
-            print "dt:",time.time()-t
-    raw_input("---continue---")
-
-    #command = "{while1;print:(int:[time:[]*10000]%10)}"
-    #print "result: "+repr(I.execute(command,printstepinfo=False,stepbystep=False,tmax=0.1))
-    #raw_input("---continue---")
-
-    #FORES = [ Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE, Fore.BLACK]
-    COLORS = {"Number"     :Fore.MAGENTA,
-              "ObjectName" :Fore.CYAN,
-              "Wait"       :Fore.WHITE,
-              "Operator"   :Fore.BLUE,
-              "String"     :Fore.CYAN,
-              "Unit"       :Fore.GREEN,
-              "List"       :Fore.RED,
-              "Structure"  :Fore.YELLOW,
-              "Comment"    :Fore.WHITE,
-              "error"      :Fore.RESET+Back.RED,
-              }
-    
-    clearscreen()
-    crode_history = [""]
-    while True:
-        crode = u""
-        sequenz = []
-        insertpos = 0
-        clearscreen()
-        nprint("%s>>> %s" %(Style.BRIGHT,Style.NORMAL))
-        while True:
-            time.sleep(dt)
-            byte = getch()
-            if byte:
-                sequenz.append(byte)
-            if sequenz:
-                try:
-                    char = bytearray(sequenz).decode(sys.stdin.encoding)
-                except UnicodeDecodeError:
-                    pass
-                else:
-                    sequenz = []
-                    if ord(char) == 127: #Backspace
-                        if insertpos > 0:
-                            crode = crode[:insertpos-1]+crode[insertpos:]
-                            insertpos -= 1
-                    elif char == "\n":
-                        try:
-                            I.parser.parse(crode)
-                        except:
-                            pass
-                        else:
-                            break
-                    elif char == u"\x1b": #Escape sequences, especially Arrow Keys
-                        direction = []
-                        while True:
-                            c = getch()
-                            if c == "":
-                                break
-                            direction.append(c)
-                        if direction == ["[","D"]:
-                            if insertpos > 0: #move cursor to the left
-                                insertpos -= 1
-                        elif direction == ["[","C"]: #move cursor to the right
-                            if insertpos < len(crode):
-                                insertpos += 1
-                        elif direction == ["[","A"]: #load last entry from history
-                            crode = crode_history[-1]
-                            insertpos = len(crode)
-                        elif direction == ["[","3","~"]: #delete
-                            if insertpos < len(crode):
-                                crode = crode[:insertpos]+crode[insertpos+1:]
-                        else:
-                            print "unknown key",direction
-                            time.sleep(0.5)
-                    else:#if 32<=ord(char)<127:
-                        crode = crode[:insertpos]+char+crode[insertpos:]
-                        insertpos += len(char)
-                    clearscreen()
-                    nprint("%s>>> %s" %(Style.BRIGHT,Style.NORMAL))
-                    colored_crode = crode
-                    tagged_line = SyntaxTaggedString(crode)
-                    try:
-                        I.parser.parse(tagged_line)
-                    except SyntaxError as error:
-                        nprint(" "*len(crode)+"\n\n") #leave space above for colored crode command
-                        nprint(error.msg)
-                        nprint(goto(MINX+4,MINY))
-                        error_begin = max(error.offset,0) #error.offset can be None
-                        tagged_line.add_tag(error_begin,len(crode),"error")
-                    tags = [(tag_begin,COLORS.get(tag,"")) for tag_begin,tag_end,tag in tagged_line.get_tags()]
-                    tags.append((insertpos,"\x1b[s")) #store curser pos
-                    tags.sort(reverse=True)
-                    for begin_index,color in tags:
-                        colored_crode=colored_crode[:begin_index]+color+colored_crode[begin_index:]
-                    nprint(colored_crode)
-                    nprint("\x1b[u") #restore cursor pos
-                    nprint(Style.RESET_ALL)
-        if crode == "q":
-            break
-        elif crode == "":
-            print I.filehandler.data
-            print I.interrupted_funcs
-            try:
-                I.continue_execute()
-            except:
-                print "ERROR:",sys.exc_info()[1]
-        else:
-            crode_history.append(crode)
-            try:
-                print
-                print "RESULT: "+repr(I.execute(crode,tmax=1,printstepinfo=False,stepbystep=True))
-            except:
-                #raise
-                print "ERROR:",sys.exc_info()[1]
-        print I.filehandler.data
+        command1 = "1:[a:=5,{while #a;a:=#a-1}]"
+        for command in (command1,):
+            print "command:", command
+            print "result: "+repr(I.execute(command,printstepinfo=False,stepbystep=False))
+            import time
+            for i in range(5):
+                t = time.time()
+                I.execute(command,printstepinfo=False,stepbystep=False)
+                print "dt:",time.time()-t
         raw_input("---continue---")
 
-    clearscreen()
-    getch.close()
-    colorama.deinit()
+        #command = "{while1;print:(int:[time:[]*10000]%10)}"
+        #print "result: "+repr(I.execute(command,printstepinfo=False,stepbystep=False,tmax=0.1))
+        #raw_input("---continue---")
+
+        #FORES = [ Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE, Fore.BLACK]
+        COLORS = {"Number"     :Fore.MAGENTA,
+                  "ObjectName" :Fore.CYAN,
+                  "Wait"       :Fore.WHITE,
+                  "Operator"   :Fore.BLUE,
+                  "String"     :Fore.CYAN,
+                  "Unit"       :Fore.GREEN,
+                  "List"       :Fore.RED,
+                  "Structure"  :Fore.YELLOW,
+                  "Comment"    :Fore.WHITE,
+                  "error"      :Fore.RESET+Back.RED,
+                  }
+        
+        clearscreen()
+        crode_history = [""]
+        while True:
+            crode = u""
+            sequenz = []
+            insertpos = 0
+            clearscreen()
+            nprint("%s>>> %s" %(Style.BRIGHT,Style.NORMAL))
+            while True:
+                time.sleep(dt)
+                byte = getch()
+                if byte:
+                    sequenz.append(byte)
+                if sequenz:
+                    try:
+                        char = bytearray(sequenz).decode(sys.stdin.encoding)
+                    except UnicodeDecodeError:
+                        pass
+                    else:
+                        sequenz = []
+                        if ord(char) == 127: #Backspace
+                            if insertpos > 0:
+                                crode = crode[:insertpos-1]+crode[insertpos:]
+                                insertpos -= 1
+                        elif char == "\n":
+                            try:
+                                I.parser.parse(crode)
+                            except:
+                                pass
+                            else:
+                                break
+                        elif char == u"\x1b": #Escape sequences, especially Arrow Keys
+                            direction = []
+                            while True:
+                                c = getch()
+                                if c == "":
+                                    break
+                                direction.append(c)
+                            if direction == ["[","D"]:
+                                if insertpos > 0: #move cursor to the left
+                                    insertpos -= 1
+                            elif direction == ["[","C"]: #move cursor to the right
+                                if insertpos < len(crode):
+                                    insertpos += 1
+                            elif direction == ["[","A"]: #load last entry from history
+                                crode = crode_history[-1]
+                                insertpos = len(crode)
+                            elif direction == ["[","3","~"]: #delete
+                                if insertpos < len(crode):
+                                    crode = crode[:insertpos]+crode[insertpos+1:]
+                            else:
+                                print "unknown key",direction
+                                time.sleep(0.5)
+                        else:#if 32<=ord(char)<127:
+                            crode = crode[:insertpos]+char+crode[insertpos:]
+                            insertpos += len(char)
+                        clearscreen()
+                        nprint("%s>>> %s" %(Style.BRIGHT,Style.NORMAL))
+                        colored_crode = crode
+                        tagged_line = SyntaxTaggedString(crode)
+                        try:
+                            I.parser.parse(tagged_line)
+                        except SyntaxError as error:
+                            nprint(" "*len(crode)+"\n\n") #leave space above for colored crode command
+                            nprint(error.msg)
+                            nprint(goto(MINX+4,MINY))
+                            error_begin = max(error.offset,0) #error.offset can be None
+                            tagged_line.add_tag(error_begin,len(crode),"error")
+                        tags = [(tag_begin,COLORS.get(tag,"")) for tag_begin,tag_end,tag in tagged_line.get_tags()]
+                        tags.append((insertpos,"\x1b[s")) #store curser pos
+                        tags.sort(reverse=True)
+                        for begin_index,color in tags:
+                            colored_crode=colored_crode[:begin_index]+color+colored_crode[begin_index:]
+                        nprint(colored_crode)
+                        nprint("\x1b[u") #restore cursor pos
+                        nprint(Style.RESET_ALL)
+            if crode == "q":
+                break
+            elif crode == "":
+                print I.filehandler.data
+                print I.interrupted_funcs
+                try:
+                    I.continue_execute()
+                except:
+                    print "ERROR:",sys.exc_info()[1]
+            else:
+                crode_history.append(crode)
+                try:
+                    print
+                    print "RESULT: "+repr(I.execute(crode,tmax=1,printstepinfo=False,stepbystep=True))
+                except:
+                    raise
+                    print "ERROR:",sys.exc_info()[1]
+            print I.filehandler.data
+            raw_input("---continue---")
+
+        clearscreen()
+        getch.close()
+        colorama.deinit()
