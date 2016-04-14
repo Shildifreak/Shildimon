@@ -260,10 +260,13 @@ class Display():
         elif lastdialogs != self.dialogs:
             self.setmode(1)
         pos = (0,0)
+        width,height = self.display.get_window_size()
         for dialog in self.dialogs:
-            text = displaydata[dialog].get("text","")
-            self.new_images.append(("<text,%s,0,0,0,255>"%escape(text),
-                                    pos,(None,14),None))
+            if displaydata[dialog].get("dialogtype",None) == "message" or True:
+                textheight = height//5
+                text = displaydata[dialog].get("text","")
+                self.new_images.append(("<text,%s,0,0,0,255>"%escape(text),
+                                        pos,(None,14),None))
 
     def landscape_events(self):
         if self.focuspos:
@@ -307,9 +310,11 @@ class Display():
             event,info = self.client_events[eventnumber]
             if info == True:
                 if event in ("left","right","up","down"):
+                    # left/right -> change between dialogs
+                    # up/down -> select something
                     pass
                 if event == "action":
-                    self.events.append(("dialog",self.dialogs[-1],"0"))
+                    self.events.append(("dialog",self.dialogs[-1],"0")) #not 0 but currently selected line
                     self.client_events.pop(eventnumber)
                 if event == "back":
                     self.events.append(("dialog",self.dialogs[-1],"-1"))

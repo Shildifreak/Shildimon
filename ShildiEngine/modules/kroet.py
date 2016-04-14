@@ -326,22 +326,25 @@ class Interpreter():
                     elif type(operator) == int:
                         result = args[operator]
                     else:
+                        #M# WHICH TYPE OF FUNCTIONS SHOULD HAVE PRECEDENCE?
                         try:
                             result = calculate(operator,args) # all the other operations that don't mess with memory
                         except NotImplementedError: # functions implemented in additional python module
                             try:
                                 result = self.call_function(operator,args,cL)
                             except NotImplementedError: # functions implemented in kroet variables
-                                print "Funktion %s not found" %operator
-                                operator = self._get_var([operator],cL)
+                                implementation = self._get_var([operator,None],cL)
+                                if not implementation:
+                                    raise ValueError("Funktion '%s' not found" %operator)
                                 print "operator %s" %operator
+                                print "implementation %s" %implementation
                                 print "args %s" %args
-                                if isinstance(operator,basestring):
+                                if isinstance(implementation,basestring):
                                     cL.i += 1
-                                    task.add_layer(self.parser.cached_parse(operator),dict(enumerate(args)))
+                                    task.add_layer(self.parser.cached_parse(implementation),dict(enumerate(args)))
                                     break
                                 else:
-                                    raise TypeError("wrong type of argument(s) for operation %s" %operator)
+                                    raise TypeError("wrong type for implementation of operation: %s" %operator)
                     cL.stack.append(result)
                     cL.i += 1
                 elif action == "wait":
@@ -542,20 +545,27 @@ class SyntaxTaggedString(unicode):
 class Parser():
     OPERATOR_RANKING = [
             ':=', '+=','-=' , '*=', '/=', '%=', '**=',
+            'custom_operator',
             '<<', '<', '<=', '==', '>=', '>', '>>',
             '!=', '<>',
-            '-', '+',
+            '+', '-', # "-" needs to have higher ranking then "+"
             '*', '/', '//', '%',
             '**',
             ':','!',
-            '#',
+            'unary_operator',
             '@',
             '.',
             ]
-    UNARY_OPERATOR_RANKING = OPERATOR_RANKING.index('#')
-    UNARY_OPERATORS = ['-', '#', '.']
+    UNARY_OPERATOR_RANKING = OPERATOR_RANKING.index('unary_operator')
+    CUSTOM_OPERATOR_RANKING = OPERATOR_RANKING.index('custom_operator')
 
-    ALLOWED_OPERATOR_CHARS = set("".join(OPERATOR_RANKING))
+    UNARY_OPERATORS = ['-', '#', '.']
+    OPERATORS = set(OPERATOR_RANKING).union(set(UNARY_OPERATORS))
+    OPERATORS.remove("unary_operator")
+    OPERATORS.remove("custom_operator")
+
+    ALLOWED_OPERATOR_CHARS = set("".join(OPERATORS))
+
     
     def __init__(self):
         self.cache = {}
@@ -648,7 +658,7 @@ class Parser():
                 pos += 1
             else:
                 break
-        if operator not in self.OPERATOR_RANKING:
+        if operator not in self.OPERATORS:
             raise SyntaxError("unknown operator %s" %operator,(self.filename,1,begin_pos,expression))
         self._addTag(expression,begin_pos,pos,"Operator")
         while True:
@@ -886,9 +896,10 @@ class Parser():
         return output, pos
 
     def _get_ranking(self,operator):
-        if operator[0] == "operator":
+        try:
             return self.OPERATOR_RANKING.index(operator[1])
-        return 0
+        except ValueError:
+            return self.CUSTOM_OPERATOR_RANKING
 
     def _reorder(self,l_input,l_output,ranking): # works inplace
         if not l_input:
@@ -902,8 +913,14 @@ class Parser():
         else:
             l_output.append(element) # operand
         while l_input and self._get_ranking(l_input[0])>=ranking:
-            operator = l_input.pop(0)
-            self._reorder(l_input,l_output,self._get_ranking(operator))
+            if l_input[0][0] != "operator":
+                operator = []
+                self._reorder(l_input,operator,self.CUSTOM_OPERATOR_RANKING+1)
+                operator_ranking = self.CUSTOM_OPERATOR_RANKING
+            else:
+                operator = l_input.pop(0)
+                operator_ranking = self._get_ranking(operator)
+            self._reorder(l_input,l_output,operator_ranking)
             l_output.append(operator) # binary operator
             if operator[0] != "operator":
                 l_output.append(("custom operation",None))
@@ -913,7 +930,8 @@ class Parser():
         """e.g. [[1],2,[3,[4]],5,(6,[7])] -> [1,2,3,4,5,(6,[7])]"""
         i = 0
         while i<len(nestedList):
-            if type(nestedList[i]) == list:
+            if isinstance(nestedList[i],list):
+            #if type(nestedList[i]) == list:
                 for element in nestedList.pop(i)[::-1]:
                     nestedList.insert(i,element)
             else:
@@ -947,8 +965,10 @@ if __name__ == "__main__":
             #M# nicht einfach so die erste Zeile ignorieren, sondern nur wenn es ein Shebang ist
             command = "[%s]" %", ".join(map(lambda s: s.strip("\n\r"),f.readlines()[1:]))
         print "executing: %s" %command
-        I.execute(command)
+        sys.exit(I.execute(command))
     else:
+        p = Parser()
+        print p.parse("#a plus #b")
         # Interaktiver Modus
         from consoleIO import colorama
         colorama.init()
@@ -1100,9 +1120,9 @@ if __name__ == "__main__":
                 crode_history.append(crode)
                 try:
                     print
-                    print "RESULT: "+repr(I.execute(crode,tmax=1,printstepinfo=False,stepbystep=True))
+                    print "RESULT: "+repr(I.execute(crode,tmax=1,printstepinfo=True,stepbystep=False))
                 except:
-                    raise
+                    #raise
                     print "ERROR:",sys.exc_info()[1]
             print I.filehandler.data
             raw_input("---continue---")

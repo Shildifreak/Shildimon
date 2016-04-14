@@ -245,6 +245,6 @@ def ingame_menu():
                ("Back",),]
 
 if __name__ == "__main__":
-    main_menu()
-    #singleplayer("ShildimonCopy","krottest.cfg")
+    #main_menu()
+    singleplayer("ShildimonCopy","krottest.cfg")
     Display.close()

@@ -99,6 +99,7 @@ def text_changed(*args):
                 #print begin_index, end_index
                 edit.tag_add(tagname, begin_index, end_index)
                 edit.tag_config(tagname, foreground=COLORS.get(tag,"black"))
+        cursor_moved()
 
 edit = CustomText(root,undo=True,font="bold")
 edit.pack(fill="both", expand=True)
